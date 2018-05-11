@@ -55,6 +55,9 @@ class GamePanel extends JPanel{
 	private double bx, fx;
 	private boolean []keys;
 	ArrayList<Block>blocks = new ArrayList<Block>();
+	ArrayList<Block>sBlocks = new ArrayList<Block>();
+	ArrayList<Enemy>enemies = new ArrayList<Enemy>();
+	ArrayList<Enemy>sEnemies = new ArrayList<Enemy>();
 	
 	public GamePanel(){
 		
@@ -80,52 +83,87 @@ class GamePanel extends JPanel{
 			}
 			if(fx < 0){
 				fx += 6;
-				for(int i = 0; i < blocks.size(); i++){
-					blocks.get(i).changeX(6);
-				}
+				player.move(-6);
 			}
-		}
+    	}
 		if(keys[KeyEvent.VK_RIGHT] ){
 			if(bx > -1000){
 				bx -= 0.5;
 			}
 			if(fx > -12000){
 				fx -= 6;
-				for(int i = 0; i < blocks.size(); i++){
-					blocks.get(i).changeX(-6);
-				}
+				player.move(6);
 			}
 		}
 		if(keys[KeyEvent.VK_SPACE]){
 		
 		}
+		if(drawn == false){
+    		drawMap();
+    	}
+		for(int i = 0; i < blocks.size(); i++){
+    		Block block = blocks.get(i);
+    		if(block.getX() > player.getPX() - 1200 && block.getX() < player.getPX() + 1200){
+    			sBlocks.add(block);
+    			blocks.remove(block);
+    		}
+		}
+		for(int i = 0; i < enemies.size(); i++){
+			Enemy enemy = enemies.get(i);
+			if(enemy.getX() > player.getPX() - 1200 && enemy.getX() < player.getPX() + 1200){
+				sEnemies.add(enemy);
+				enemies.remove(enemy);
+			}
+		}
+		for(int i = 0; i < sBlocks.size(); i++){
+			Block block = sBlocks.get(i);
+    		if(block.getX() < player.getPX() - 1200 || block.getX() > player.getPX() + 1200){
+    			blocks.add(block);
+    			sBlocks.remove(block);
+    		}
+		}
+		for(int i = 0; i < sEnemies.size(); i++){
+			Enemy enemy = sEnemies.get(i);
+			int d = Math.abs(player.getPX() - enemy.getX());
+			System.out.println(d);
+			if(d < 800){
+				enemy.chase(player);
+			}
+    		if(enemy.getX() > player.getPX() + 1200 || enemy.getX() < player.getPX() - 1200){
+    			enemies.add(enemy);
+    			sEnemies.remove(enemy);
+    		}
+		}
     }
+    
     public void drawMap(){
 	    for(int i = 0; i < 50; i++){
-			blocks.add(new Block(100 * i, 1000, 500, 850));
+			blocks.add(new Block(100 * i, 1000, 850));
 		}
 		for(int i = 0; i < 10; i++){
-			blocks.add(new Block(500 + 200 * i, 1000, 500, 800 - 100 * i));
+			blocks.add(new Block(1000 + 200 * i, 1000, 800 - 100 * i));
 		}
+		enemies.add(new Enemy(3000, 1000, 1000, player.getY()));
 		
 		drawn = true;
+		System.out.println(drawn);
     }
+    
     public void paintComponent(Graphics g){
     	g.drawImage(background, (int)bx, 0, this);
     	g.drawImage(foreground, (int)fx + 10000, 0, this);
     	g.drawImage(foreground, (int)fx, 0, this);
+    	for(int i = 0; i < sBlocks.size(); i++){
+    		Block block = sBlocks.get(i);
+    		g.setColor(new Color(0, 0, 255));
+    		g.fillRect(block.getX() - player.getPX() + 950, block.getSY(), 100, 50);
+    	}
+    	for(int i = 0; i < sEnemies.size(); i++){
+    		Enemy enemy = sEnemies.get(i);
+    		g.setColor(new Color(0, 255, 0));
+    		g.fillRect(enemy.getX() - player.getPX() + 950, enemy.getSY(), 100, 50);
+    	}
     	g.setColor(new Color(255, 0, 0));
     	g.fillRect(player.getX(), player.getY(), 50, 50);
-    	if(drawn == false){
-    		drawMap();
-    	}
-    	for(int i = 0; i < blocks.size(); i++){
-    		Block block = blocks.get(i);
-    		int d = block.getX() - 950;
-    		if(block.getX() > player.getX() - 1200 && block.getX() < player.getX() + 1200){
-    			g.setColor(new Color(0, 0, 255));
-    			g.fillRect(950 + d, block.getSY(), 100, 50);
-    		}
-    	}
     }
 }
