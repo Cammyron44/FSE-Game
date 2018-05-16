@@ -68,7 +68,7 @@ class GamePanel extends JPanel{
 		
 		background = background.getScaledInstance(5000, 1000, background.SCALE_SMOOTH);
 		foreground = foreground.getScaledInstance(10000, 1000, foreground.SCALE_SMOOTH);
-			
+		
 		setSize(1900, 1000);
 	}
 	
@@ -78,22 +78,45 @@ class GamePanel extends JPanel{
     
     public void refresh(){
     	if(keys[KeyEvent.VK_LEFT] ){
-			if(bx < 0){
-				bx += 0.5;
+			if(fx == -12000 && player.getX() > 950){
+				player.changeX(-6);
 			}
-			if(fx < 0){
-				fx += 6;
-				player.move(-6);
+			else{
+				if(bx < 0){
+					bx += 0.5;
+				}
+				if(fx < 0){
+					fx += 6;
+					player.move(-6);
+				}
+				if(fx == 0){
+					if(player.getX() > 50){
+						player.changeX(-6);	
+					}
+				}	
 			}
+			System.out.println(player.getX());
     	}
 		if(keys[KeyEvent.VK_RIGHT] ){
-			if(bx > -1000){
-				bx -= 0.5;
+			if(fx == 0 && player.getX() < 950){
+				player.changeX(6);	
 			}
-			if(fx > -12000){
-				fx -= 6;
-				player.move(6);
+			else{
+				if(bx > -1000){
+					bx -= 0.5;
+				}
+				if(fx > -12000){
+					fx -= 6;
+					player.move(6);
+				}
+				if(fx == -12000){
+					if(player.getX() < 1850){
+						player.changeX(6);	
+					}
+				}	
 			}
+			System.out.println(fx);
+			System.out.println(player.getX());
 		}
 		if(keys[KeyEvent.VK_SPACE]){
 		
@@ -125,7 +148,6 @@ class GamePanel extends JPanel{
 		for(int i = 0; i < sEnemies.size(); i++){
 			Enemy enemy = sEnemies.get(i);
 			int d = Math.abs(player.getPX() - enemy.getX());
-			System.out.println(d);
 			if(d < 800){
 				enemy.chase(player);
 			}
@@ -143,27 +165,34 @@ class GamePanel extends JPanel{
 		for(int i = 0; i < 10; i++){
 			blocks.add(new Block(1000 + 200 * i, 1000, 800 - 100 * i));
 		}
-		enemies.add(new Enemy(3000, 1000, 1000, player.getY()));
+		for(int i = 0; i < 3; i++){
+			enemies.add(new Enemy(2000 + 2000 * i, 1000, 1000, player.getY()));	
+		}
 		
 		drawn = true;
 		System.out.println(drawn);
     }
     
     public void paintComponent(Graphics g){
+    	
     	g.drawImage(background, (int)bx, 0, this);
     	g.drawImage(foreground, (int)fx + 10000, 0, this);
     	g.drawImage(foreground, (int)fx, 0, this);
+    	
     	for(int i = 0; i < sBlocks.size(); i++){
     		Block block = sBlocks.get(i);
     		g.setColor(new Color(0, 0, 255));
     		g.fillRect(block.getX() - player.getPX() + 950, block.getSY(), 100, 50);
     	}
+    	
     	for(int i = 0; i < sEnemies.size(); i++){
     		Enemy enemy = sEnemies.get(i);
     		g.setColor(new Color(0, 255, 0));
     		g.fillRect(enemy.getX() - player.getPX() + 950, enemy.getSY(), 100, 50);
     	}
+    	
     	g.setColor(new Color(255, 0, 0));
     	g.fillRect(player.getX(), player.getY(), 50, 50);
+    	
     }
 }

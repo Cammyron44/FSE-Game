@@ -1,6 +1,6 @@
 //Player
 class Player {
-	private int x = 950, y = 800, px = 950, py = 800;
+	private int x = 950, y = 800, px = 950, py = 800, direction;
 	public Player(){
 		
 	}
@@ -16,8 +16,14 @@ class Player {
 	public int getPY(){
 		return py;
 	}
+	public void changeX(int n){
+		x += n;
+	}
 	public void move(int n){
 		px += n;
+	}
+	public void setDirection(int d){
+		direction = d;
 	}
 }
 	
