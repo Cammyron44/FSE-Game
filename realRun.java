@@ -126,6 +126,7 @@ class GamePanel extends JPanel {
 			man.fall();
 		}
 		System.out.println(man.getGround());
+		System.out.println(man.getXPos());
 	}
 	
 	
@@ -216,39 +217,65 @@ class Player {
 	}
 	//////////////////////////////HORIZONTAL MOVEMENT//////////////////////////////
 	public void moveRight(){
-		//vx = 0;
 		if (vx < 5){
 			vx += 0.4;
 		}
-		//for (int i = 0; i < 5; i++){
-			if (getPixelColor(image, (int) xPos + 53, (int) y + 99) == false && getPixelColor(image, (int) xPos+ 53, (int) y) == false){
-				if (x + (int) vx < 4100){
-					x += (int) vx;
+		
+		if (xPos <= 890){
+			xPos += (int) vx;
+		}
+		else if (x >= 4090){
+			xPos += (int) vx;
+		}
+		else{
+			x += (int) vx;
+		}
+			/*if (getPixelColor(image, (int) xPos + 53, (int) y + 99) == false && getPixelColor(image, (int) xPos + 53, (int) y) == false){
+				if (xPos >= 890 && xPos <= 910){
+					if (x >= 4000){
+						
+					}
+					else{
+						x += (int) vx;
+					}
 				}
-				//vx += 1;
+				else{
+					//if (x + (int) vx < 4100){
+						xPos += (int) vx;
+					//}
+				}
 			}
 			else{
 				vx = 0;
-			}
-		//}
+			}*/
 	}
 	
 	public void moveLeft(){
-		//vx = 0;
 		if (vx < 5){
 			vx += 0.4;
 		}
-		//for (int i = 0; i < 5; i++){
-			if (getPixelColor(image, (int) xPos - 2, (int) y + 99) == false && getPixelColor(image, (int) xPos - 2, (int) y) == false){
-				if (x - (int) vx > 0){
-					x -= (int) vx;
+		if (xPos >= 910){
+			xPos -= (int) vx;
+		}
+		else if (x <= 10){
+			xPos -= (int) vx;
+		}
+		else{
+			x -= (int) vx;
+		}
+			/*if (getPixelColor(image, (int) xPos - 2, (int) y + 99) == false && getPixelColor(image, (int) xPos - 2, (int) y) == false){
+				if (xPos <= 890 && x <= 10 || xPos >= 910 && x >= 4090){
+					xPos -= (int) vx;
 				}
-				//vx += 1;
+				else{
+					if (x - (int) vx > 0){
+						x -= (int) vx;
+					}
+				}
 			}
 			else{
 				vx = 0;
-			}
-		//}
+			}*/
 	}
 	
 	public void slowDown(String d){
