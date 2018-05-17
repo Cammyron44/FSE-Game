@@ -220,62 +220,38 @@ class Player {
 		if (vx < 5){
 			vx += 0.4;
 		}
-		
-		if (xPos <= 890){
-			xPos += (int) vx;
-		}
-		else if (x >= 4090){
-			xPos += (int) vx;
-		}
-		else{
-			x += (int) vx;
-		}
-			/*if (getPixelColor(image, (int) xPos + 53, (int) y + 99) == false && getPixelColor(image, (int) xPos + 53, (int) y) == false){
-				if (xPos >= 890 && xPos <= 910){
-					if (x >= 4000){
-						
-					}
-					else{
-						x += (int) vx;
-					}
-				}
-				else{
-					//if (x + (int) vx < 4100){
-						xPos += (int) vx;
-					//}
+		if (getPixelColor(image, (int) xPos + 53, (int) y + 99) == false && getPixelColor(image, (int) xPos + 53, (int) y) == false){
+			if (xPos <= 890){
+				xPos += (int) vx;
+			}
+			else if (x >= 4090){
+				if (xPos < 1830){ //max distance
+					xPos += (int) vx;
 				}
 			}
 			else{
-				vx = 0;
-			}*/
+				x += (int) vx;
+			}
+		}
 	}
 	
 	public void moveLeft(){
 		if (vx < 5){
 			vx += 0.4;
 		}
-		if (xPos >= 910){
-			xPos -= (int) vx;
-		}
-		else if (x <= 10){
-			xPos -= (int) vx;
-		}
-		else{
-			x -= (int) vx;
-		}
-			/*if (getPixelColor(image, (int) xPos - 2, (int) y + 99) == false && getPixelColor(image, (int) xPos - 2, (int) y) == false){
-				if (xPos <= 890 && x <= 10 || xPos >= 910 && x >= 4090){
+		if (getPixelColor(image, (int) xPos - 2, (int) y + 99) == false && getPixelColor(image, (int) xPos - 2, (int) y) == false){
+			if (xPos >= 910){
+				xPos -= (int) vx;
+			}
+			else if (x <= 10){
+				if (xPos > 10){ //min distance
 					xPos -= (int) vx;
-				}
-				else{
-					if (x - (int) vx > 0){
-						x -= (int) vx;
-					}
 				}
 			}
 			else{
-				vx = 0;
-			}*/
+				x -= (int) vx;
+			}
+		}
 	}
 	
 	public void slowDown(String d){
@@ -283,22 +259,32 @@ class Player {
 			if (vx > 0){
 				vx -= 0.3;
 			}
-			if (getPixelColor(image, (int) xPos + 52, (int) y + 99) == true || getPixelColor(image, (int) xPos + 52, (int) y) == true){
-				vx = 0;
+			if (xPos <= 890){
+				xPos += (int) vx;
 			}
-			if (x + (int) vx < 4100){
-				x += vx;
+			else if (x >= 4090){
+				if (xPos < 1830){ //max distance
+					xPos += (int) vx;
+				}
 			}
+			else{
+				x += (int) vx;
+			}	
 		}
 		else{
 			if (vx > 0){
 				vx -= 0.3;
 			}
-			if (getPixelColor(image, (int) xPos - 2, (int) y + 99) == true || getPixelColor(image, (int) xPos - 2, (int) y) == true){
-				vx = 0;
+			if (xPos >= 910){
+				xPos -= (int) vx;
 			}
-			if (x - (int) vx > 0){
-				x -= vx;
+			else if (x <= 10){
+				if (xPos > 10){ //min distance
+					xPos -= (int) vx;
+				}
+			}
+			else{
+				x -= (int) vx;
 			}
 		}
 	}
