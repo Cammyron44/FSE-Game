@@ -78,6 +78,7 @@ class GamePanel extends JPanel{
     
     public void refresh(){
     	if(keys[KeyEvent.VK_LEFT] ){
+    		player.setDirection(0);
 			if(fx == -12000 && player.getX() > 950){
 				player.changeX(-6);
 			}
@@ -95,9 +96,9 @@ class GamePanel extends JPanel{
 					}
 				}	
 			}
-			System.out.println(player.getX());
     	}
 		if(keys[KeyEvent.VK_RIGHT] ){
+			player.setDirection(1);
 			if(fx == 0 && player.getX() < 950){
 				player.changeX(6);	
 			}
@@ -115,8 +116,6 @@ class GamePanel extends JPanel{
 					}
 				}	
 			}
-			System.out.println(fx);
-			System.out.println(player.getX());
 		}
 		if(keys[KeyEvent.VK_SPACE]){
 		
@@ -148,7 +147,7 @@ class GamePanel extends JPanel{
 		for(int i = 0; i < sEnemies.size(); i++){
 			Enemy enemy = sEnemies.get(i);
 			int d = Math.abs(player.getPX() - enemy.getX());
-			if(d < 800){
+			if(d < 900){
 				enemy.chase(player);
 			}
     		if(enemy.getX() > player.getPX() + 1200 || enemy.getX() < player.getPX() - 1200){
@@ -170,7 +169,7 @@ class GamePanel extends JPanel{
 		}
 		
 		drawn = true;
-		System.out.println(drawn);
+		
     }
     
     public void paintComponent(Graphics g){
