@@ -8,7 +8,7 @@ import java.util.*;
 
 public class parallax extends JFrame implements ActionListener,KeyListener{
 	javax.swing.Timer myTimer;
-	GamePanel game;
+	GamePanel game; 
 
     public parallax() {
 		super("parallax");
@@ -51,8 +51,9 @@ public class parallax extends JFrame implements ActionListener,KeyListener{
 class GamePanel extends JPanel{
 	private Image background, foreground;
 	private Player player;
-	private boolean drawn = false;
+	private boolean drawn = false, attack = false;
 	private double bx, fx;
+	private int cooldown, time = 0;
 	private boolean []keys;
 	ArrayList<Block>blocks = new ArrayList<Block>();
 	ArrayList<Block>sBlocks = new ArrayList<Block>();
@@ -118,7 +119,10 @@ class GamePanel extends JPanel{
 			}
 		}
 		if(keys[KeyEvent.VK_SPACE]){
-		
+			if(time < 0){
+				attack();
+				time = cooldown;
+			}
 		}
 		if(drawn == false){
     		drawMap();
@@ -147,7 +151,7 @@ class GamePanel extends JPanel{
 		for(int i = 0; i < sEnemies.size(); i++){
 			Enemy enemy = sEnemies.get(i);
 			int d = Math.abs(player.getPX() - enemy.getX());
-			if(d < 900){
+			if(d < 850){
 				enemy.chase(player);
 			}
     		if(enemy.getX() > player.getPX() + 1200 || enemy.getX() < player.getPX() - 1200){
@@ -155,6 +159,25 @@ class GamePanel extends JPanel{
     			sEnemies.remove(enemy);
     		}
 		}
+		time -= 1;
+		
+    }
+    public void attack(){
+    	for(Enemy enemy : sEnemies){
+    		if(player.getDirection() == 0){
+    			if(player.getX() - enemy.getX() > 0 && player.getX() - enemy.getX() < 300 && enemy.getY() == player.getY()){
+    				enemy.takeDamage(player.damage());
+    				System.out.println("hit");
+    			}
+    		}
+    		if(player.getDirection() == 1){
+    			if(player.getX() - enemy.getX() < 0 && player.getX() - enemy.getX() > -300 && enemy.getY() == player.getY()){
+    				enemy.takeDamage(player.damage());
+    				System.out.println("hit");
+    			}
+    		}
+    	}
+    	System.out.println("attack");
     }
     
     public void drawMap(){
