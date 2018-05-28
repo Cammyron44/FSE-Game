@@ -1,6 +1,6 @@
 //Enemy
 public class Enemy{
-	int x, y, sx, sy, hp = 100;
+	int x, y, sx, sy, hp = 100, maxHP = 100;
 	public Enemy(int x, int y, int sx, int sy){
 		this.x = x;
 		this.y = y;
@@ -18,6 +18,12 @@ public class Enemy{
 	}
 	public void takeDamage(int damage){
 		hp -= damage;
+	}
+	public int getHP(){
+		return hp;
+	}
+	public int getMaxHP(){
+		return maxHP;
 	}
 	public void chase(Player player){
 		if(player.getPX() > x){

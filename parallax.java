@@ -53,12 +53,13 @@ class GamePanel extends JPanel{
 	private Player player;
 	private boolean drawn = false, attack = false;
 	private double bx, fx;
-	private int cooldown, time = 0;
+	private int cooldown, time = 0, level = 1;
 	private boolean []keys;
 	ArrayList<Block>blocks = new ArrayList<Block>();
 	ArrayList<Block>sBlocks = new ArrayList<Block>();
 	ArrayList<Enemy>enemies = new ArrayList<Enemy>();
 	ArrayList<Enemy>sEnemies = new ArrayList<Enemy>();
+	ArrayList<Arrow>arrows = new ArrayList<Arrow>();
 	
 	public GamePanel(){
 		
@@ -120,12 +121,17 @@ class GamePanel extends JPanel{
 		}
 		if(keys[KeyEvent.VK_SPACE]){
 			if(time < 0){
-				attack();
-				time = cooldown;
+				if(player.getType() == "archer"){
+					arrows.add(player.shoot(player.damage()));
+				}
+				else{
+					attack();
+				}
+				time = player.getCooldown();
 			}
 		}
 		if(drawn == false){
-    		drawMap();
+    		drawMap(level);
     	}
 		for(int i = 0; i < blocks.size(); i++){
     		Block block = blocks.get(i);
@@ -158,39 +164,57 @@ class GamePanel extends JPanel{
     			enemies.add(enemy);
     			sEnemies.remove(enemy);
     		}
+    		if(enemy.getHP() <= 0){
+    			sEnemies.remove(enemy);
+    		}
+    		
+		}
+		for(int i = 0; i < arrows.size(); i++){
+			Arrow arrow = arrows.get(i);
+			int d = Math.abs(player.getX() - arrow.getX());
+			if(d > 900){
+				arrows.remove(arrow);
+				i += 1;
+			}
+			arrow.move();
 		}
 		time -= 1;
 		
     }
     public void attack(){
     	for(Enemy enemy : sEnemies){
+    		int d = player.getPX() - enemy.getX();
     		if(player.getDirection() == 0){
-    			if(player.getX() - enemy.getX() > 0 && player.getX() - enemy.getX() < 300 && enemy.getY() == player.getY()){
+    			if(d > 0 && d < player.getRange()){
     				enemy.takeDamage(player.damage());
-    				System.out.println("hit");
     			}
     		}
     		if(player.getDirection() == 1){
-    			if(player.getX() - enemy.getX() < 0 && player.getX() - enemy.getX() > -300 && enemy.getY() == player.getY()){
+    			if(d < 0 && d > -player.getRange()){
     				enemy.takeDamage(player.damage());
-    				System.out.println("hit");
     			}
     		}
     	}
-    	System.out.println("attack");
     }
     
-    public void drawMap(){
-	    for(int i = 0; i < 50; i++){
+    public void drawMap(int level){
+    	if(level == 1){
+    		for(int i = 0; i < 50; i++){
 			blocks.add(new Block(100 * i, 1000, 850));
+			}
+			for(int i = 0; i < 10; i++){
+				blocks.add(new Block(1000 + 200 * i, 1000, 800 - 100 * i));
+			}
+			for(int i = 0; i < 3; i++){
+				enemies.add(new Enemy(2000 + 2000 * i, 1000, 1000, player.getY()));	
+			}	
+    	}
+    	if(level == 2){
+    		
+    	}
+		if(level == 3){
+			
 		}
-		for(int i = 0; i < 10; i++){
-			blocks.add(new Block(1000 + 200 * i, 1000, 800 - 100 * i));
-		}
-		for(int i = 0; i < 3; i++){
-			enemies.add(new Enemy(2000 + 2000 * i, 1000, 1000, player.getY()));	
-		}
-		
 		drawn = true;
 		
     }
@@ -210,11 +234,25 @@ class GamePanel extends JPanel{
     	for(int i = 0; i < sEnemies.size(); i++){
     		Enemy enemy = sEnemies.get(i);
     		g.setColor(new Color(0, 255, 0));
-    		g.fillRect(enemy.getX() - player.getPX() + 950, enemy.getSY(), 100, 50);
+    		g.fillRect(enemy.getX() - player.getPX() + 950, enemy.getSY(), 50, 50);
+    		g.setColor(new Color(255, 255, 255));
+    		g.fillRect(enemy.getX() - player.getPX() + 925, enemy.getSY() - 30, 108, 12);
+    		g.setColor(new Color(255, 0, 0));
+    		g.fillRect(enemy.getX() - player.getPX() + 930, enemy.getSY() - 28, enemy.getHP(), 8);
+    	}
+    	for(int i = 0; i < arrows.size(); i++){
+    		Arrow arrow = arrows.get(i);
+    		g.setColor(new Color(0, 0, 0));
+    		System.out.println(arrow.getX());
+    		g.fillRect(arrow.getX(), arrow.getY(), 10, 2);
     	}
     	
     	g.setColor(new Color(255, 0, 0));
     	g.fillRect(player.getX(), player.getY(), 50, 50);
+    	g.setColor(new Color(255, 255, 255));
+    	g.fillRect(player.getX() - 28, player.getY() - 30, 106, 12);
+    	g.setColor(new Color(255, 0, 0));
+    	g.fillRect(player.getX() - 23, player.getY() - 28, 97, 8);
     	
     }
 }
