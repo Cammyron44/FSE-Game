@@ -122,7 +122,9 @@ class GamePanel extends JPanel{
 		if(keys[KeyEvent.VK_SPACE]){
 			if(time < 0){
 				if(player.getType() == "archer"){
-					arrows.add(player.shoot(player.damage()));
+					if(player.getX() == 950){
+						arrows.add(player.shoot(player.damage()));	
+					}
 				}
 				else{
 					attack();
@@ -171,10 +173,19 @@ class GamePanel extends JPanel{
 		}
 		for(int i = 0; i < arrows.size(); i++){
 			Arrow arrow = arrows.get(i);
-			int d = Math.abs(player.getX() - arrow.getX());
-			if(d > 900){
+			int d = Math.abs(player.getPX() - arrow.getX());
+			if(d > 950){
 				arrows.remove(arrow);
 				i += 1;
+			}
+			for(int j = 0; j < sEnemies.size(); j++){
+				Enemy enemy = sEnemies.get(j);
+				if(arrow.collide(enemy, player)){
+					enemy.takeDamage(arrow.getDamage());
+					arrows.remove(arrow);
+					i += 1;
+					System.out.println("hit");
+				}
 			}
 			arrow.move();
 		}
@@ -206,7 +217,7 @@ class GamePanel extends JPanel{
 				blocks.add(new Block(1000 + 200 * i, 1000, 800 - 100 * i));
 			}
 			for(int i = 0; i < 3; i++){
-				enemies.add(new Enemy(2000 + 2000 * i, 1000, 1000, player.getY()));	
+				enemies.add(new Enemy(2000 + 2000 * i, 1000, 1000, player.getY(), 50, 50));	
 			}	
     	}
     	if(level == 2){
@@ -234,19 +245,18 @@ class GamePanel extends JPanel{
     	for(int i = 0; i < sEnemies.size(); i++){
     		Enemy enemy = sEnemies.get(i);
     		g.setColor(new Color(0, 255, 0));
-    		g.fillRect(enemy.getX() - player.getPX() + 950, enemy.getSY(), 50, 50);
+    		g.fillRect(enemy.getX() - player.getPX() + 950, enemy.getSY(), enemy.getWidth(), enemy.getHeight());
     		g.setColor(new Color(255, 255, 255));
     		g.fillRect(enemy.getX() - player.getPX() + 925, enemy.getSY() - 30, 108, 12);
     		g.setColor(new Color(255, 0, 0));
     		g.fillRect(enemy.getX() - player.getPX() + 930, enemy.getSY() - 28, enemy.getHP(), 8);
     	}
+    	
     	for(int i = 0; i < arrows.size(); i++){
     		Arrow arrow = arrows.get(i);
-    		g.setColor(new Color(0, 0, 0));
-    		System.out.println(arrow.getX());
-    		g.fillRect(arrow.getX(), arrow.getY(), 10, 2);
+    		g.setColor(new Color(100, 150, 100));
+    		g.fillRect(arrow.getX() - player.getPX() + 950, arrow.getY() + 20, 30, 6);
     	}
-    	
     	g.setColor(new Color(255, 0, 0));
     	g.fillRect(player.getX(), player.getY(), 50, 50);
     	g.setColor(new Color(255, 255, 255));

@@ -35,7 +35,7 @@ class Player {
 			return 20;
 		}
 		if(type.equals("archer")){
-			return 20;
+			return 40;
 		}
 		return 100;
 	}
@@ -57,7 +57,7 @@ class Player {
 		}
 	}
 	public Arrow shoot(int damage){
-		return new Arrow(damage, direction, x, y);
+		return new Arrow(damage, direction, px, y);
 	}
 	
 	public int damage(){
