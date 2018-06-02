@@ -7,6 +7,7 @@
  */
 
 import java.awt.*;
+import java.util.ArrayList;
 import java.awt.event.*;
 import javax.swing.*;
 import java.awt.image.*;
@@ -53,9 +54,7 @@ public class realRun extends JFrame implements ActionListener, KeyListener {
     
     public static void main(String[]args){
     	new realRun();
-    }
-    
-    
+    }    
 }
 
 class GamePanel extends JPanel {
@@ -67,7 +66,22 @@ class GamePanel extends JPanel {
 	Player man;
 	String playerDirection;
 	
+	Integer coin;
+	Image coinImage;
+	Image[] coinImages;
+	double coinFrame;
+	ArrayList <Coin> screenCoins, allCoins;
+	Rectangle coinRect;
+	
+	
+	private BufferedImage mask = null;
+	int red, bronze, yellow;
+	
 	public GamePanel(){
+		
+		loadImage();
+		loadCoins();
+		
 		keys = new boolean [KeyEvent.KEY_LAST + 1];
 
 		back = new ImageIcon("back.jpg").getImage();
@@ -87,8 +101,72 @@ class GamePanel extends JPanel {
 		platRect = new Rectangle(700, 500, 500, 50);
 		
 		man = new Player();
+		
+		coinFrame = 0;
+		coinImages = new Image[10];
+    	for (int i = 0; i < 10; i++){
+    		Integer coinNum = i;
+    		String imageName = "coin/coin";
+    		coinImage = new ImageIcon(imageName + coinNum.toString() + ".png").getImage();
+    		coinImages[i] = coinImage;
+    	}
 	}
 	
+	public void loadImage(){
+		try {
+    		mask = ImageIO.read(new File("map1Mask.png"));
+		} 
+		catch (IOException e) {
+		}
+		red = getPixelCol(mask, 75, 25); //for instant death areas
+		bronze = getPixelCol(mask, 125, 25); //regular coins
+		yellow = getPixelCol(mask, 175, 25); //star coins
+    }
+    
+    public int getPixelCol(BufferedImage mask, int xx, int yy){
+    	return mask.getRGB(xx , yy);
+    }
+    /////////////////////////////////COINS////////////////////////////////////////
+    public void loadCoins(){
+    	allCoins = new ArrayList <Coin>();
+    	for (int i = 0; i < 500; i++){
+			for (int j = 0; j < 20; j++){
+				if (getPixelCol(mask, i * 50, j * 50) == bronze){
+					allCoins.add(new Coin(i * 50, j * 50)); //wherever there is a yellow space on the mask, create a coin object there
+				}
+			}
+    	}
+    }
+    
+    public void checkCoin(){
+    	for (int i = 0; i < allCoins.size(); i++){
+    		coinRect = new Rectangle(allCoins.get(i).getX() - man.getX(), allCoins.get(i).getY(), 50, 50); //smoother to check rectangles/squares than a point on the coin
+    		if (playerRect.intersects(coinRect)){ //player picks up coin			
+    			allCoins.get(i).setPickedTrue();
+    		}
+    		if (allCoins.get(i).getPicked() == true){ //once coin is picked up, used for animation
+    			if (allCoins.get(i).getY() - allCoins.get(i).getNewY() < 50){ // how far the coin will raise
+    				allCoins.get(i).addNewY(); //raise the coin
+    			}
+    			else{
+    				allCoins.remove(i); //once the coin gets high enough, get rid of it
+    				//ADD TO PLAYER SCORE //add to the player score
+    			}	
+    		}
+    	}
+    }
+    	
+	public void coinFrameIncrease(){
+		for (int i = 0; i < allCoins.size(); i++){
+			if (allCoins.get(i).getPicked() == true){
+				allCoins.get(i).speedFrame(); //increase frame + framerate of specific coin if picked up
+			}
+			else{
+				allCoins.get(i).increaseFrame(); //increase frame of all coins at general rate
+			}
+		}
+	}
+	//////////////////////////////////////////////////////////////////////////////
 	public void setKey(int k, boolean v) {
     	keys[k] = v;
     }
@@ -96,6 +174,9 @@ class GamePanel extends JPanel {
 	public void refresh(){
 		playerRect = new Rectangle(man.getXPos(), man.getYPos(), 50, 100);
 		move();
+		moveLava();
+		checkCoin();
+		coinFrameIncrease();
 	}
 	
 	public void move(){
@@ -132,7 +213,6 @@ class GamePanel extends JPanel {
 			man.fall();
 		}
 		//////////////////////////////////////////////////////////////////////////////
-		moveLava();
 	}
 	
 	public void moveLava(){
@@ -153,6 +233,9 @@ class GamePanel extends JPanel {
 		g.drawImage(map1, -man.getX(), 0, this);
 		g.setColor(new Color(0, 0, 0));
 		g2.fill(playerRect);
+		for (int i = 0; i < allCoins.size(); i++){
+			g.drawImage(coinImages[allCoins.get(i).getFrame()], allCoins.get(i).getX() - man.getX(), allCoins.get(i).getNewY(), this);
+		}
 	}
 }
 
