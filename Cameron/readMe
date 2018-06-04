@@ -1,6 +1,3 @@
-Here's the updates version of realRun with coins.
-Check it out.
-I have two sets if coins we can use.
-Go to lin 108 in real run and change "coin/coin" to "coins/starCoin" and you can see the other coin I added.
-Tell me which one you want in the game for the regular coins.
-The special can be the starCoin (021 - 030) which I still have to add.
+Aight my program is done.
+Check out the three black/white coin slots in the top left.
+They fill once the animation after you pick up a coin has finished.
