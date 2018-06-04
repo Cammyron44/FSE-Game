@@ -71,7 +71,7 @@ class GamePanel extends JPanel {
 	Image coinImage, starCoinImage, starCoinBW, starCoinSmall;
 	Image[] coinImages, starCoinImages;
 	ArrayList <Coin> allCoins;
-	ArrayList <StarCoin> allStarCoins;
+	ArrayList <StarCoin> allStarCoins, starCoinsPicked;
 	Rectangle coinRect, starCoinRect;
 	
 	
@@ -104,9 +104,7 @@ class GamePanel extends JPanel {
 		man = new Player();
 		
 		starCoinSmall = new ImageIcon("coin/starCoin0.png").getImage();
-		starCoinSmall = starCoinSmall.getScaledInstance(75, 75, Image.SCALE_SMOOTH);
 		starCoinBW = new ImageIcon("coin/starCoinBW.png").getImage();
-		starCoinBW = starCoinBW.getScaledInstance(75, 75, Image.SCALE_SMOOTH);
 		
 		coinImages = new Image[10];
     	for (int i = 0; i < 10; i++){
@@ -124,7 +122,7 @@ class GamePanel extends JPanel {
     		starCoinImages[i] = starCoinImage;
     	}
 	}
-	
+	//////////////////////////////////////////////////////////////////////////////
 	public void loadImage(){
 		try {
     		mask = ImageIO.read(new File("map1Mask.png"));
@@ -144,7 +142,7 @@ class GamePanel extends JPanel {
     	allCoins = new ArrayList <Coin>();
     	for (int i = 0; i < 500; i++){
 			for (int j = 0; j < 20; j++){
-				if (getPixelCol(mask, i * 50, j * 50) == bronze && i != 2){
+				if (getPixelCol(mask, i * 50, j * 50) == bronze && i != 2){ //cannot be 2 because on the mask that space is the base colour (we dont want a coin being created there)
 					allCoins.add(new Coin(i * 50, j * 50)); //wherever there is a bronze space on the mask, create a coin object there
 				}
 			}
@@ -182,10 +180,13 @@ class GamePanel extends JPanel {
 	///////////////////////////////STAR COINS////////////////////////////////////////
     public void loadStarCoins(){
     	allStarCoins = new ArrayList <StarCoin>();
+    	starCoinsPicked = new ArrayList <StarCoin>();
+    	int n = 0; //keeps track of which coin it is (helps the player know which coins he needs to pick up (or is has skipped one)
     	for (int i = 0; i < 500; i++){
 			for (int j = 0; j < 20; j++){
-				if (getPixelCol(mask, i * 50, j * 50) == yellow && i != 3){
-					allStarCoins.add(new StarCoin(i * 50 - 25, j * 50 - 25)); //wherever there is a yellow space on the mask, create a coin object there
+				if (getPixelCol(mask, i * 50, j * 50) == yellow && i != 3){ //cannot be 3 because on the mask that space is the base colour (we dont want a star coin being created there)
+					allStarCoins.add(new StarCoin(i * 50 - 25, j * 50 - 25, n)); //wherever there is a yellow space on the mask, create a coin object there
+					n++;
 				}
 			}
     	}
@@ -193,7 +194,7 @@ class GamePanel extends JPanel {
     
     public void checkStarCoin(){
     	for (int i = 0; i < allStarCoins.size(); i++){
-    		starCoinRect = new Rectangle(allStarCoins.get(i).getX() - man.getX() - 25, allStarCoins.get(i).getY() - 25, 100, 100); //smoother to check rectangles/squares than a point on the coin
+    		starCoinRect = new Rectangle(allStarCoins.get(i).getX() - man.getX(), allStarCoins.get(i).getY(), 100, 100); //smoother to check rectangles/squares than a point on the star coin
     		if (playerRect.intersects(starCoinRect)){ //player picks up coin			
     			allStarCoins.get(i).setPickedTrue();
     		}
@@ -202,6 +203,7 @@ class GamePanel extends JPanel {
     				allStarCoins.get(i).addNewY(); //raise the coin
     			}
     			else{
+    				starCoinsPicked.add(allStarCoins.get(i)); //add to array (used for showing user which coins they have/have not picked up)
     				allStarCoins.remove(i); //once the coin gets high enough, get rid of it
     				starCoinCount ++;
     				//ADD TO PLAYER SCORE //add to the player score
@@ -290,17 +292,16 @@ class GamePanel extends JPanel {
 		g.setColor(new Color(0, 0, 0));
 		g2.fill(playerRect);
 		for (int i = 0; i < 3; i++){
-			g.drawImage(starCoinBW, 1900 - 100- (i * 85), 15 , this);
+			g.drawImage(starCoinBW, 1900 - ((i + 1) * 110), 10 , this); //black and white images of coins (meaning they havent been picked up yet)
 		}
-		for (int i = 0; i < starCoinCount; i++){
-			g.drawImage(starCoinSmall, 1900 - 100 - (i * 85), 15 , this);
+		for (int i = 0; i < starCoinsPicked.size(); i++){
+			g.drawImage(starCoinSmall, 1900 - ((starCoinsPicked.get(i).getNum() + 1) * 110), 10 , this); //when the coins have been picked up (displays which one you have picked up)
 		}
-		
 		for (int i = 0; i < allCoins.size(); i++){
-			g.drawImage(coinImages[allCoins.get(i).getFrame()], allCoins.get(i).getX() - man.getX(), allCoins.get(i).getNewY(), this);
+			g.drawImage(coinImages[allCoins.get(i).getFrame()], allCoins.get(i).getX() - man.getX(), allCoins.get(i).getNewY(), this); //displays all regular coins
 		}
 		for (int i = 0; i < allStarCoins.size(); i++){
-			g.drawImage(starCoinImages[allStarCoins.get(i).getFrame()], allStarCoins.get(i).getX() - man.getX(), allStarCoins.get(i).getNewY(), this);
+			g.drawImage(starCoinImages[allStarCoins.get(i).getFrame()], allStarCoins.get(i).getX() - man.getX(), allStarCoins.get(i).getNewY(), this); //displays all star coins (that have not been picked up yet)
 		}
 	}
 }
@@ -346,7 +347,6 @@ class Player {
     	for (int d = 0; d < 50; d++){
     		c = image.getRGB(d + xx + (int) x, yy);
     		if (c == platform){
-    		//if ((c & 0x00ff0000) >> 16 == 0 && (c & 0x0000ff00) >> 8 == 255 && (c & 0x000000ff) == 1){ //checks for (0, 255, 0);
     			b = true;
     		}
     	}
@@ -359,7 +359,6 @@ class Player {
     	for (int d = 0; d < 50; d++){
     		c = image.getRGB(d + xx + (int) x, yy + 100);
     		if (c == platform){
-    		//if ((c & 0x00ff0000) >> 16 == 0 && (c & 0x0000ff00) >> 8 == 255 && (c & 0x000000ff) == 1){ //checks for (0, 255, 0);
     			b = true;
     		}
     	}
@@ -372,7 +371,6 @@ class Player {
     	for (int d = 0; d < 100; d++){
     		c = image.getRGB(xx + (int) x + 50, yy + d);
     		if (c == platform){
-    		//if ((c & 0x00ff0000) >> 16 == 0 && (c & 0x0000ff00) >> 8 == 255 && (c & 0x000000ff) == 1){ //checks for (0, 255, 0);
     			b = true;
     		}
     	}
@@ -385,7 +383,6 @@ class Player {
     	for (int d = 0; d < 100; d++){
     		c = image.getRGB(xx + (int) x - 1, yy + d);
     		if (c == platform){
-    		//if ((c & 0x00ff0000) >> 16 == 0 && (c & 0x0000ff00) >> 8 == 255 && (c & 0x000000ff) == 1){ //checks for (0, 255, 0);
     			b = true;
     		}
     	}

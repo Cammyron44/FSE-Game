@@ -8,15 +8,16 @@
 
 
 public class StarCoin {
-	private int x, y, newY;
+	private int x, y, newY, num;
 	private double frame;
 	private boolean picked;
 	
-    public StarCoin(int xx, int yy) {
+    public StarCoin(int xx, int yy, int n) {
     	x = xx;
     	y = yy;
     	newY = yy;
     	frame = 0;
+    	num = n;
     	picked = false;
     }
     
@@ -64,5 +65,17 @@ public class StarCoin {
     
     public int getY(){
     	return y;
+    }
+    
+    public void addX(int xx){
+    	x += xx;
+    }
+    
+    public void addY(int yy){
+    	y += yy;
+    }
+    
+    public int getNum(){
+    	return num;
     }
 }
