@@ -60,18 +60,19 @@ public class realRun extends JFrame implements ActionListener, KeyListener {
 class GamePanel extends JPanel {
 	
 	private boolean[] keys;
-	private Image back, backMask, test, map1, map1Lava, lava;
+	private Image back, backMask, test, map1, lava;
 	private double lavaX;
 	private Rectangle playerRect, baseRect, platRect;
 	Player man;
 	String playerDirection;
 	
-	Integer coin;
-	Image coinImage;
-	Image[] coinImages;
-	double coinFrame;
-	ArrayList <Coin> screenCoins, allCoins;
-	Rectangle coinRect;
+	int starCoinCount = 0;
+	Integer coin, starCoin;
+	Image coinImage, starCoinImage, starCoinBW, starCoinSmall;
+	Image[] coinImages, starCoinImages;
+	ArrayList <Coin> allCoins;
+	ArrayList <StarCoin> allStarCoins;
+	Rectangle coinRect, starCoinRect;
 	
 	
 	private BufferedImage mask = null;
@@ -81,16 +82,16 @@ class GamePanel extends JPanel {
 		
 		loadImage();
 		loadCoins();
+		loadStarCoins();
 		
 		keys = new boolean [KeyEvent.KEY_LAST + 1];
 
 		back = new ImageIcon("back.jpg").getImage();
 		back = back.getScaledInstance(1900, 1000,Image.SCALE_SMOOTH);
 		backMask = new ImageIcon("backMask.png").getImage();
-		backMask = backMask.getScaledInstance(1900, 1000,Image.SCALE_SMOOTH);
+		backMask = backMask.getScaledInstance(1900, 1000, Image.SCALE_SMOOTH);
 		test = new ImageIcon("test1.png").getImage();
 		map1 = new ImageIcon("map1.png").getImage();
-		map1Lava = new ImageIcon("map1Lava.png").getImage();
 		
 		lava = new ImageIcon("lava.png").getImage();
 		lavaX = -1900;
@@ -102,13 +103,25 @@ class GamePanel extends JPanel {
 		
 		man = new Player();
 		
-		coinFrame = 0;
+		starCoinSmall = new ImageIcon("coin/starCoin0.png").getImage();
+		starCoinSmall = starCoinSmall.getScaledInstance(75, 75, Image.SCALE_SMOOTH);
+		starCoinBW = new ImageIcon("coin/starCoinBW.png").getImage();
+		starCoinBW = starCoinBW.getScaledInstance(75, 75, Image.SCALE_SMOOTH);
+		
 		coinImages = new Image[10];
     	for (int i = 0; i < 10; i++){
     		Integer coinNum = i;
     		String imageName = "coin/coin";
     		coinImage = new ImageIcon(imageName + coinNum.toString() + ".png").getImage();
     		coinImages[i] = coinImage;
+    	}
+    	
+    	starCoinImages = new Image[10];
+    	for (int i = 0; i < 10; i++){
+    		Integer starCoinNum = i;
+    		String imageName = "coin/starCoin";
+    		starCoinImage = new ImageIcon(imageName + starCoinNum.toString() + ".png").getImage();
+    		starCoinImages[i] = starCoinImage;
     	}
 	}
 	
@@ -131,8 +144,8 @@ class GamePanel extends JPanel {
     	allCoins = new ArrayList <Coin>();
     	for (int i = 0; i < 500; i++){
 			for (int j = 0; j < 20; j++){
-				if (getPixelCol(mask, i * 50, j * 50) == bronze){
-					allCoins.add(new Coin(i * 50, j * 50)); //wherever there is a yellow space on the mask, create a coin object there
+				if (getPixelCol(mask, i * 50, j * 50) == bronze && i != 2){
+					allCoins.add(new Coin(i * 50, j * 50)); //wherever there is a bronze space on the mask, create a coin object there
 				}
 			}
     	}
@@ -166,6 +179,47 @@ class GamePanel extends JPanel {
 			}
 		}
 	}
+	///////////////////////////////STAR COINS////////////////////////////////////////
+    public void loadStarCoins(){
+    	allStarCoins = new ArrayList <StarCoin>();
+    	for (int i = 0; i < 500; i++){
+			for (int j = 0; j < 20; j++){
+				if (getPixelCol(mask, i * 50, j * 50) == yellow && i != 3){
+					allStarCoins.add(new StarCoin(i * 50 - 25, j * 50 - 25)); //wherever there is a yellow space on the mask, create a coin object there
+				}
+			}
+    	}
+    }
+    
+    public void checkStarCoin(){
+    	for (int i = 0; i < allStarCoins.size(); i++){
+    		starCoinRect = new Rectangle(allStarCoins.get(i).getX() - man.getX() - 25, allStarCoins.get(i).getY() - 25, 100, 100); //smoother to check rectangles/squares than a point on the coin
+    		if (playerRect.intersects(starCoinRect)){ //player picks up coin			
+    			allStarCoins.get(i).setPickedTrue();
+    		}
+    		if (allStarCoins.get(i).getPicked() == true){ //once coin is picked up, used for animation
+    			if (allStarCoins.get(i).getY() - allStarCoins.get(i).getNewY() < 100){ // how far the coin will raise
+    				allStarCoins.get(i).addNewY(); //raise the coin
+    			}
+    			else{
+    				allStarCoins.remove(i); //once the coin gets high enough, get rid of it
+    				starCoinCount ++;
+    				//ADD TO PLAYER SCORE //add to the player score
+    			}	
+    		}
+    	}
+    }
+    	
+	public void starCoinFrameIncrease(){
+		for (int i = 0; i < allStarCoins.size(); i++){
+			if (allStarCoins.get(i).getPicked() == true){
+				allStarCoins.get(i).speedFrame(); //increase frame + framerate of specific coin if picked up
+			}
+			else{
+				allStarCoins.get(i).increaseFrame(); //increase frame of all coins at general rate
+			}
+		}
+	}
 	//////////////////////////////////////////////////////////////////////////////
 	public void setKey(int k, boolean v) {
     	keys[k] = v;
@@ -176,7 +230,9 @@ class GamePanel extends JPanel {
 		move();
 		moveLava();
 		checkCoin();
+		checkStarCoin();
 		coinFrameIncrease();
+		starCoinFrameIncrease();
 	}
 	
 	public void move(){
@@ -233,8 +289,18 @@ class GamePanel extends JPanel {
 		g.drawImage(map1, -man.getX(), 0, this);
 		g.setColor(new Color(0, 0, 0));
 		g2.fill(playerRect);
+		for (int i = 0; i < 3; i++){
+			g.drawImage(starCoinBW, 1900 - 100- (i * 85), 15 , this);
+		}
+		for (int i = 0; i < starCoinCount; i++){
+			g.drawImage(starCoinSmall, 1900 - 100 - (i * 85), 15 , this);
+		}
+		
 		for (int i = 0; i < allCoins.size(); i++){
 			g.drawImage(coinImages[allCoins.get(i).getFrame()], allCoins.get(i).getX() - man.getX(), allCoins.get(i).getNewY(), this);
+		}
+		for (int i = 0; i < allStarCoins.size(); i++){
+			g.drawImage(starCoinImages[allStarCoins.get(i).getFrame()], allStarCoins.get(i).getX() - man.getX(), allStarCoins.get(i).getNewY(), this);
 		}
 	}
 }
