@@ -1,13 +1,13 @@
 //Enemy
+import java.awt.*;
+
 public class Enemy{
-	int x, y, sx, sy, hp = 100, maxHP = 100, width, height;
-	public Enemy(int x, int y, int sx, int sy, int width, int height){
+	int x, y, xPos, yPos, hp = 100, maxHP = 100, width = 50, height = 50;
+	public Enemy(int x, int y, int sx, int sy){
 		this.x = x;
 		this.y = y;
 		this.sx = sx;
 		this.sy = sy;
-		this.width = width;
-		this.height = height;
 	}
 	public int getSY(){
 		return sy;
@@ -24,6 +24,9 @@ public class Enemy{
 	public int getHeight(){
 		return height;
 	}
+	public Rectangle getRect(){
+		return new Rectangle(x, y, width, height);
+	}
 	public void takeDamage(int damage){
 		hp -= damage;
 	}
@@ -34,10 +37,10 @@ public class Enemy{
 		return maxHP;
 	}
 	public void chase(Player player){
-		if(player.getPX() > x){
+		if(player.getXPos() > x){
 			x += 2;
 		}
-		if(player.getPX() < x){
+		if(player.getXPos() < x){
 			x -= 2;
 		}
 	}

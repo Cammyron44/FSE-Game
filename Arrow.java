@@ -1,19 +1,21 @@
 //Arrow
+import java.awt.*;
 
 class Arrow{
-	private int damage, direction, x, y, width = 30, height = 6;
-	public Arrow(int damage, int direction, int x, int y){
+	private int damage, x, y, width = 30, height = 6;
+	private String direction;
+	public Arrow(int damage, String direction, int x, int y){
 		this.damage = damage;
 		this.direction = direction;
 		this.x = x;
 		this.y = y;
 	}
 	public void move(){
-		if(direction == 0){
-			x -= 15;
+		if(direction.equals("left")){
+			x -= 8;
 		}
-		if(direction == 1){
-			x += 15;
+		if(direction.equals("right")){
+			x += 8;
 		}
 	}
 	public int getX(){
@@ -22,26 +24,10 @@ class Arrow{
 	public int getY(){
 		return y;
 	}
+	public Rectangle getRect(){
+		return new Rectangle(x, y, width, height);
+	}
 	public int getDamage(){
 		return damage;
-	}
-	public boolean collide(Enemy enemy, Player player){
-		int ex = enemy.getX() - player.getPX() + 950;
-		int ax = x - player.getPX() + 950;
-		System.out.println(ax + "     ");
-		System.out.println(ex + "     ");
-		if(enemy.getSY() >= y && enemy.getSY() - enemy.getHeight() <= y){
-			if(direction == 0){
-				if(ex > ax && ex - enemy.getWidth() < ax){
-					return true;
-				}
-			}
-			if(direction == 1){
-				if(ex < ax && ex + enemy.getWidth() > ax){
-					return true;
-				}
-			}
-		}
-		return false;
 	}
 }
