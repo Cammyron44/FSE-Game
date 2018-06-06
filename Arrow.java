@@ -12,10 +12,10 @@ class Arrow{
 	}
 	public void move(){
 		if(direction.equals("left")){
-			x -= 8;
+			x -= 10;
 		}
 		if(direction.equals("right")){
-			x += 8;
+			x += 10;
 		}
 	}
 	public int getX(){
@@ -24,8 +24,8 @@ class Arrow{
 	public int getY(){
 		return y;
 	}
-	public Rectangle getRect(){
-		return new Rectangle(x, y, width, height);
+	public Rectangle getRect(Player man){
+		return new Rectangle(x + man.getX(), y, width, height);
 	}
 	public int getDamage(){
 		return damage;

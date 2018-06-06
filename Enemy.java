@@ -6,11 +6,14 @@ public class Enemy{
 	public Enemy(int x, int y, int sx, int sy){
 		this.x = x;
 		this.y = y;
-		this.sx = sx;
-		this.sy = sy;
+		this.xPos = xPos;
+		this.yPos = yPos;
 	}
-	public int getSY(){
-		return sy;
+	public int getYPos(){
+		return yPos;
+	}
+	public int getXPos(){
+		return xPos;
 	}
 	public int getX(){
 		return (int)x;

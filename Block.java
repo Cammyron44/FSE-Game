@@ -1,38 +1,25 @@
-/**
- * @(#)Ground.java
- *
- *
- * @author 
- * @version 1.00 2018/6/6
- */
+//Block
 
 import java.awt.*;
 
 class Block{
 	private String type;
-	private int x, y;
+	private int x, y, xPos, yPos, width = 50, height = 50;
 	private Rectangle rect;
 	
-	public Block(int xx, int yy, String t){
-		x = xx;
-		y = yy;
-		type = t;
-		rect = new Rectangle(x, y, 50, 50);
+	public Block(int x, int y){
+		this.x = x;
+		this.y = y;
+		rect = new Rectangle(x, y, width, height);
+	}
+	public int getX(){
+		return x;
+	}
+	public int getY(){
+		return y;
 	}
 	
 	public Rectangle getRect(){
 		return rect;
-	}
-	
-	public String getType(){
-		return type;
-	}
-	
-	public int getX(){
-		return x;
-	}
-	
-	public int getY(){
-		return y;
 	}
 }

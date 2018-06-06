@@ -69,8 +69,9 @@ class GamePanel extends JPanel {
 	ArrayList<Arrow>arrows = new ArrayList<Arrow>();
 	ArrayList<Enemy>enemies = new ArrayList<Enemy>();
 	ArrayList<Enemy>sEnemies = new ArrayList<Enemy>();
-	ArrayList<Ground>ground = new ArrayList<Ground>();
-	ArrayList<Ground>sGround = new ArrayList<Ground>();
+	ArrayList<Block>blocks = new ArrayList<Block>();
+	ArrayList<Block>sBlocks = new ArrayList<Block>();
+	ArrayList<Coin>sCoins = new ArrayList<Coin>();
 	
 	Player man;
 	String playerDirection;
@@ -90,6 +91,7 @@ class GamePanel extends JPanel {
 		
 		loadImage();
 		loadCoins();
+		loadBlocks();
 		
 		keys = new boolean [KeyEvent.KEY_LAST + 1];
 
@@ -176,6 +178,17 @@ class GamePanel extends JPanel {
 			}
 		}
 	}
+	////////////////////////////////////BLOCKS/////////////////////////////////////
+	public void loadBlocks(){
+    	for (int i = 0; i < 500; i++){
+			for (int j = 0; j < 20; j++){
+				if (getPixelCol(mask, i * 50, j * 50) == green){
+					Block block = new Block(i * 50, j * 50);
+					blocks.add(block); 
+				}
+			}
+    	}
+    }
 	//////////////////////////////////////////////////////////////////////////////
 	public void setKey(int k, boolean v) {
     	keys[k] = v;
@@ -199,9 +212,6 @@ class GamePanel extends JPanel {
 				sEnemies.add(enemy);
 				enemies.remove(enemy);
 			}
-		}
-		for(int i = 0; i < sEnemies.size(); i++){
-			Enemy enemy = sEnemies.get(i);
 			int d = Math.abs(man.getX() - enemy.getX());
 			if(d < 850){
 				enemy.chase(man);
@@ -225,15 +235,14 @@ class GamePanel extends JPanel {
 		for(int i = 0; i < arrows.size(); i++){
 			Arrow arrow = arrows.get(i);
 			int d = Math.abs(man.getXPos() - arrow.getX());
-			if(d > 1200){
+			if(d > 960){
 				arrows.remove(arrow);
-				i++;
 			}
 			arrow.move();
-			for(int j = 0; j < sBlocks.size(); j++){
-				if(arrow.getRect().intersects(sGround.get(j).getRect())){
+			for(int j = 0; j < blocks.size(); j++){
+				Block block = blocks.get(j);
+				if(arrow.getRect(man).intersects(block.getRect())){
 					arrows.remove(arrow);
-					i++;
 				}
 			}
 		}
@@ -391,7 +400,6 @@ class Player {
 		while(d < minDamage){
 			d = random.nextInt(maxDamage);
 		}
-		System.out.println(d);
 		return d;
 	}
 	///////////////////////////////LOAD IMAGE//////////////////////////////////////
