@@ -64,14 +64,13 @@ class GamePanel extends JPanel {
 	private Image back, backMask, test, map1, map1Lava, lava;
 	private double lavaX;
 	private int time = 0, cooldown = 100;
-	private Rectangle playerRect, baseRect, platRect, HPRect, HPBackRect;
+	private Rectangle playerRect, baseRect, platRect, HPRect, HPBackRect, RealRect;
 	
 	ArrayList<Arrow>arrows = new ArrayList<Arrow>();
+	ArrayList<Arrow>eArrows = new ArrayList<Arrow>();
 	ArrayList<Enemy>enemies = new ArrayList<Enemy>();
-	ArrayList<Enemy>sEnemies = new ArrayList<Enemy>();
 	ArrayList<Block>blocks = new ArrayList<Block>();
-	ArrayList<Block>sBlocks = new ArrayList<Block>();
-	ArrayList<Coin>sCoins = new ArrayList<Coin>();
+	ArrayList<Cannon>cannons = new ArrayList<Cannon>();
 	
 	Player man;
 	String playerDirection;
@@ -196,6 +195,7 @@ class GamePanel extends JPanel {
 		
 	public void refresh(){
 		playerRect = new Rectangle(man.getXPos(), man.getYPos(), 50, 100);
+		RealRect = new Rectangle(man.getX(), man.getYPos(), 50, 100);
 		HPRect = new Rectangle(man.getXPos() - 23, man.getYPos() - 28, 97, 8);
 		HPBackRect = new Rectangle(man.getXPos() - 27, man.getYPos() - 30, 106, 12);
 		shoot();
@@ -204,7 +204,9 @@ class GamePanel extends JPanel {
 		moveLava();
 		checkCoin();
 		coinFrameIncrease();
+		shootCannons();
 	}
+
 	public void renderEnemies(){
 		for(int i = 0; i < enemies.size(); i++){
 			Enemy enemy = enemies.get(i);
@@ -225,6 +227,31 @@ class GamePanel extends JPanel {
     		}
 		}
 	}
+	
+	public void shootCannons(){
+		for(int i = 0; i < cannons.size(); i++){
+			Cannon cannon = cannons.get(i);
+			eArrows.add(cannon.shoot());
+		}
+		for(int i = 0; i < eArrows.size(); i++){
+			Arrow arrow = eArrows.get(i);
+			int d = Math.abs(man.getX() - arrow.getX());
+			if(d > 2000){
+				eArrows.remove(arrow);
+			}
+			arrow.move();
+			for(int j = 0; j < blocks.size(); j++){
+				Block block = blocks.get(j);
+				if(arrow.getRect(man).intersects(block.getRect())){
+					eArrows.remove(arrow);
+				}
+			}
+			if(arrow.getRect(man).intersects(RealRect)){
+				eArrows.remove(arrow);
+			}
+		}
+	}
+	
 	public void shoot(){
 		if(keys[KeyEvent.VK_ENTER]){
 			if(time > cooldown){
@@ -314,6 +341,11 @@ class GamePanel extends JPanel {
 		}
 		for(int i = 0; i < arrows.size(); i++){
     		Arrow arrow = arrows.get(i);
+    		g.setColor(new Color(100, 150, 100));
+    		g.fillRect(arrow.getX(), arrow.getY() + 20, 30, 6);
+    	}
+    	for(int i = 0; i < eArrows.size(); i++){
+    		Arrow arrow = eArrows.get(i);
     		g.setColor(new Color(100, 150, 100));
     		g.fillRect(arrow.getX(), arrow.getY() + 20, 30, 6);
     	}
