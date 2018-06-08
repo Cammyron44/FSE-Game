@@ -6,6 +6,14 @@
  * @version 1.00 2018/6/1
  */
 
+import java.awt.*;
+import java.util.ArrayList;
+import java.awt.event.*;
+import javax.swing.*;
+import java.awt.image.*;
+import java.io.*;
+import javax.imageio.ImageIO;
+import java.awt.image.BufferedImage;
 
 public class Coin {
 	private int x, y, newY;
