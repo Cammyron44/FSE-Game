@@ -8,6 +8,7 @@
 
 import java.awt.*;
 import java.util.ArrayList;
+import java.util.Random;
 import java.awt.event.*;
 import javax.swing.*;
 import java.awt.image.*;
@@ -16,8 +17,9 @@ import javax.imageio.ImageIO;
 import java.awt.image.BufferedImage;
 
 public class Player {
+	private int maxDamage, minDamage;
 	private double x, xPos, yPos, vx, vy, sx, sy;
-	private String direction;
+	private String direction, type = "archer";
 	private boolean jump, ground;
 	int screenX = 1900;
 	int screenY = 1000;
@@ -220,6 +222,31 @@ public class Player {
 				}
 			}
 		}
+	}
+	/////////////////////////ATTACK///////////////////////////////
+	public Arrow shoot(int damage){
+		return new Arrow(damage, direction, (int)xPos, (int)yPos);
+	}
+	
+	public int damage(){
+		Random random = new Random();
+		int d = 0;
+		if(type.equals("warrior")){
+			minDamage = 40;
+			maxDamage = 80;
+		}
+		if(type.equals("assassin")){
+			minDamage = 10;
+			maxDamage = 100;
+		}
+		if(type.equals("archer")){
+			minDamage = 20;
+			maxDamage = 40;
+		}
+		while(d < minDamage){
+			d = random.nextInt(maxDamage);
+		}
+		return d;
 	}
 	////////////////////////////GETTERS AND SETTERS////////////////////////////////
 	public int getX(){
