@@ -1,7 +1,7 @@
 /**
  * @(#)realRun.java
  *
- *
+ * Cam
  * @author 
  * @version 1.00 2018/5/15
  */
@@ -62,6 +62,7 @@ class GamePanel extends JPanel {
 	private boolean[] keys;
 	private Image back, backMask, test, map1, lava;
 	private double lavaX;
+	private int time = 0, cooldown = 100;
 	private Rectangle playerRect, healthRect;
 	Player man;
 	String playerDirection;
@@ -72,7 +73,13 @@ class GamePanel extends JPanel {
 	Image[] coinImages, starCoinImages;
 	ArrayList <Coin> allCoins;
 	ArrayList <StarCoin> allStarCoins, starCoinsPicked;
-	Rectangle coinRect, starCoinRect;
+	Rectangle coinRect, starCoinRect, RealRect;
+	
+	ArrayList<Arrow>arrows = new ArrayList<Arrow>();
+	ArrayList<Arrow>eArrows = new ArrayList<Arrow>();
+	ArrayList<Enemy>enemies = new ArrayList<Enemy>();
+	ArrayList<Block>blocks = new ArrayList<Block>();
+	ArrayList<Cannon>cannons = new ArrayList<Cannon>();
 	
 	ArrayList <Fireball> fireballs;
 	Rectangle fireRect;
@@ -91,6 +98,7 @@ class GamePanel extends JPanel {
 		loadCoins();
 		loadStarCoins();
 		loadFireballs();
+		loadBlocks();
 		
 		keys = new boolean [KeyEvent.KEY_LAST + 1];
 
@@ -187,6 +195,17 @@ class GamePanel extends JPanel {
 			}
 		}
 	}
+	////////////////////////////////////BLOCKS/////////////////////////////////////
+	public void loadBlocks(){
+    	for (int i = 0; i < 500; i++){
+			for (int j = 0; j < 20; j++){
+				if (getPixelCol(mask, i * 50, j * 50) == green){
+					Block block = new Block(i * 50, j * 50, "");
+					blocks.add(block); 
+				}
+			}
+    	}
+    }
 	///////////////////////////////STAR COINS////////////////////////////////////////
     public void loadStarCoins(){
     	allStarCoins = new ArrayList <StarCoin>();
@@ -316,9 +335,75 @@ class GamePanel extends JPanel {
     	keys[k] = v;
     }
 		
+	public void renderEnemies(){
+		for(int i = 0; i < enemies.size(); i++){
+			Enemy enemy = enemies.get(i);
+			if(enemy.getX() > man.getX() - 1200 && enemy.getX() < man.getX() + 1200){
+				enemies.remove(enemy);
+			}
+			int d = Math.abs(man.getX() - enemy.getX());
+			if(d < 600){
+				enemy.chase(man);
+			}
+    		if(enemy.getHP() <= 0){
+    			enemies.remove(enemy);
+    		}
+		}
+	}
+	
+	public void shootCannons(){
+		for(int i = 0; i < cannons.size(); i++){
+			Cannon cannon = cannons.get(i);
+			eArrows.add(cannon.shoot());
+		}
+		for(int i = 0; i < eArrows.size(); i++){
+			Arrow arrow = eArrows.get(i);
+			int d = Math.abs(man.getX() - arrow.getX());
+			if(d > 2000){
+				eArrows.remove(arrow);
+			}
+			arrow.move();
+			for(int j = 0; j < blocks.size(); j++){
+				Block block = blocks.get(j);
+				if(arrow.getRect(man).intersects(block.getRect())){
+					eArrows.remove(arrow);
+				}
+			}
+			if(arrow.getRect(man).intersects(RealRect)){
+				eArrows.remove(arrow);
+			}
+		}
+	}
+	
+	public void shoot(){
+		if(keys[KeyEvent.VK_ENTER]){
+			if(time > cooldown){
+				arrows.add(man.shoot(man.damage()));		
+				time = 0;
+			}
+		}
+		for(int i = 0; i < arrows.size(); i++){
+			Arrow arrow = arrows.get(i);
+			int d = Math.abs(man.getXPos() - arrow.getX());
+			if(d > 960){
+				arrows.remove(arrow);
+			}
+			arrow.move();
+			for(int j = 0; j < blocks.size(); j++){
+				Block block = blocks.get(j);
+				if(arrow.getRect(man).intersects(block.getRect())){
+					arrows.remove(arrow);
+				}
+			}
+		}
+		time += 1;
+		
+	}
+	
 	public void refresh(){
 		playerRect = new Rectangle(man.getXPos(), man.getYPos(), 50, 100);
 		healthRect = new Rectangle(650, 30, (int)((double) man.getHealth()/100 * 600), 50);
+		RealRect = new Rectangle(man.getX(), man.getYPos(), 50, 100);
 		move();
 		moveLava();
 		jumpFireballs();
@@ -327,6 +412,9 @@ class GamePanel extends JPanel {
 		checkStarCoin();
 		coinFrameIncrease();
 		starCoinFrameIncrease();
+		shoot();
+		renderEnemies();
+		shootCannons();
 	}
 		
 	public void paintComponent(Graphics g){
@@ -353,6 +441,19 @@ class GamePanel extends JPanel {
 		for (int i = 0; i < allStarCoins.size(); i++){
 			g.drawImage(starCoinImages[allStarCoins.get(i).getFrame()], allStarCoins.get(i).getX() - man.getX(), allStarCoins.get(i).getNewY(), this); //displays all star coins (that have not been picked up yet)
 		}
+		for(int i = 0; i < arrows.size(); i++){
+    		Arrow arrow = arrows.get(i);
+    		g.setColor(new Color(100, 150, 100));
+    		g.fillRect(arrow.getX(), arrow.getY() + 20, 30, 6);
+    	}
+    	for(int i = 0; i < enemies.size(); i++){
+    		g.setColor(new Color(255, 255, 255));
+    	}
+    	for(int i = 0; i < eArrows.size(); i++){
+    		Arrow arrow = eArrows.get(i);
+    		g.setColor(new Color(100, 150, 100));
+    		g.fillRect(arrow.getX(), arrow.getY() + 20, 30, 6);
+    	}
 		//////////////////////////////////////////////////////////////////////////////
 		g.setColor(new Color(255, 255, 255));
 		g2.fillRect(645, 25, 610, 60);
