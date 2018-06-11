@@ -90,7 +90,7 @@ class GamePanel extends JPanel {
 	private BufferedImage mask = null;
 	private BufferedImage fireMask = null;
 	
-	int green, red, bronze, yellow;
+	int green, red, bronze, yellow, black;
 	
 	public GamePanel(){
 		
@@ -150,6 +150,7 @@ class GamePanel extends JPanel {
 		red = getPixelCol(mask, 75, 25); //for instant death areas
 		bronze = getPixelCol(mask, 125, 25); //regular coins
 		yellow = getPixelCol(mask, 175, 25); //star coins
+		black = getPixelCol(mask, 225, 25); //cannon
     }
     
     public int getPixelCol(BufferedImage mask, int xx, int yy){
