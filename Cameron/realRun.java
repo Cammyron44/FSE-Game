@@ -63,14 +63,14 @@ class GamePanel extends JPanel {
 	private boolean[] keys;
 	private Image back, backMask, test, map1, lava;
 	private double lavaX;
-	private int time = 0, cooldown = 100;
+	private int time = 0, cooldown = 125;
 	private Rectangle playerRect, healthRect;
 	Player man;
 	String playerDirection;
 	
 	int starCoinCount = 0;
 	Integer coin, starCoin;
-	Image coinImage, starCoinImage, starCoinBW, starCoinSmall;
+	Image coinImage, starCoinImage, starCoinBW, starCoinSmall, cannonPic, bullet;
 	Image[] coinImages, starCoinImages;
 	ArrayList <Coin> allCoins;
 	ArrayList <StarCoin> allStarCoins, starCoinsPicked;
@@ -111,6 +111,10 @@ class GamePanel extends JPanel {
 		backMask = backMask.getScaledInstance(1900, 1000, Image.SCALE_SMOOTH);
 		test = new ImageIcon("test.png").getImage();
 		map1 = new ImageIcon("map1.png").getImage();
+		cannonPic = new ImageIcon("cannon.png").getImage();
+		cannonPic = cannonPic.getScaledInstance(50, 50, Image.SCALE_SMOOTH);
+		bullet = new ImageIcon("bulletBill.png").getImage();
+		bullet = bullet.getScaledInstance(50, 25, Image.SCALE_SMOOTH);
 		
 		lava = new ImageIcon("lava.png").getImage();
 		lavaX = -1900;
@@ -341,7 +345,7 @@ class GamePanel extends JPanel {
 		for(int i = 0; i < 500; i++){
 			for(int j = 0; j < 20; j++){
 				if(getPixelCol(fireMask, i * 50, j * 50) == black && i != 1){
-					cannons.add(new Cannon(i * 50 - 25, j * 50, 1000 - j * 50));
+					cannons.add(new Cannon(i * 50, j * 50, 1000 - j * 50));
 				}
 			}
 		}
@@ -363,11 +367,8 @@ class GamePanel extends JPanel {
 	public void renderEnemies(){
 		for(int i = 0; i < enemies.size(); i++){
 			Enemy enemy = enemies.get(i);
-			if(enemy.getX() > man.getX() - 1200 && enemy.getX() < man.getX() + 1200){
-				enemies.remove(enemy);
-			}
-			int d = Math.abs(man.getXPos() - enemy.getX());
-			if(d < 600){
+			int d = Math.abs(man.getX() - enemy.getX());
+			if(d < 800 && Math.abs(man.getYPos() - enemy.getY()) < 100){
 				enemy.chase(man);
 			}
     		if(enemy.getHP() <= 0){
@@ -381,13 +382,13 @@ class GamePanel extends JPanel {
 			for(int i = 0; i < cannons.size(); i++){
 				Cannon cannon = cannons.get(i);
 				eArrows.add(cannon.shoot(man));
-				time = 0;	
+				time = 0;
 			}
 		}
 		for(int i = 0; i < eArrows.size(); i++){
 			Arrow arrow = eArrows.get(i);
 			int d = Math.abs(man.getX() - arrow.getX());
-			if(d > 2000){
+			if(d > 4000){	
 				eArrows.remove(arrow);
 				i++;
 			}
@@ -400,9 +401,6 @@ class GamePanel extends JPanel {
 				}
 			}
 			if(arrow.getRealRect(man).intersects(RealRect)){
-				System.out.println("hit");
-				System.out.println(arrow.getX());
-				System.out.println(man.getX());
 				eArrows.remove(arrow);
 				man.takeDamage(arrow.getDamage());
 				i++;
@@ -426,6 +424,9 @@ class GamePanel extends JPanel {
 		starCoinFrameIncrease();
 		renderEnemies();
 		shootCannons();
+		if(man.getHealth() <= 0){
+			System.out.println("ded");
+		}
 	}
 		
 	public void paintComponent(Graphics g){
@@ -454,16 +455,11 @@ class GamePanel extends JPanel {
 		}
     	for(int i = 0; i < cannons.size(); i++){
     		Cannon cannon = cannons.get(i);
-    		g.setColor(new Color(0, 0, 0));
-    		g.fillRect(cannon.getX() - man.getX(), cannon.getY(), 50, 50);
-    	}
-    	for(int i = 0; i < enemies.size(); i++){
-    		g.setColor(new Color(255, 255, 255));
+    		g.drawImage(cannonPic, cannon.getX() - man.getX(), cannon.getY(), this);
     	}
     	for(int i = 0; i < eArrows.size(); i++){
     		Arrow arrow = eArrows.get(i);
-    		g.setColor(new Color(100, 150, 100));
-    		g.fillRect(arrow.getX() - man.getX(), arrow.getY() + 20, 30, 6);
+    		g.drawImage(bullet, arrow.getX() - man.getX(), arrow.getY(), this);
     	}
 		//////////////////////////////////////////////////////////////////////////////
 		g.setColor(new Color(255, 255, 255));

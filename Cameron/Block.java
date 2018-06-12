@@ -31,10 +31,6 @@ class Block{
 		return rect;
 	}
 	
-	public String getType(){
-		return type;
-	}
-	
 	public int getX(){
 		return x;
 	}

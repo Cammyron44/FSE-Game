@@ -9,7 +9,7 @@ class Cannon{
 		this.xPos = xPos;
 	}
 	public Arrow shoot(Player man){
-		return new Arrow(25, "left", x, y);	
+		return new Arrow(10, "left", x, y);	
 	}
 	public int getX(){
 		return x;
