@@ -35,14 +35,22 @@ public class Enemy{
 	public int getMaxHP(){
 		return maxHP;
 	}
+	public void move(){
+		if(direction == "left"){
+			x -= 2;
+		}
+		if(direction == "right"){
+			x += 2;
+		}
+	}
 	public void chase(Player player){
 		if(player.getX() > x){
 			direction = "right";
-			x += 2;
+			x += 4;
 		}
 		if(player.getX() < x){
 			direction = "left";
-			x -= 2;
+			x -= 4;
 		}
 	}
 }
