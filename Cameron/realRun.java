@@ -1,7 +1,7 @@
 /**
  * @(#)realRun.java
  *
- * Cam
+ * 
  * @author 
  * @version 1.00 2018/5/15
  */
@@ -10,6 +10,7 @@ import java.awt.*;
 import java.util.ArrayList;
 import java.awt.event.*;
 import javax.swing.*;
+import java.awt.geom.*;
 import java.awt.image.*;
 import java.io.*;
 import javax.imageio.ImageIO;
@@ -85,6 +86,7 @@ class GamePanel extends JPanel {
 	Rectangle fireRect;
 	Image fireball;
 	int fireCount = 0;
+	double fireAng = 0;
 	
 	
 	private BufferedImage mask = null;
@@ -99,6 +101,7 @@ class GamePanel extends JPanel {
 		loadStarCoins();
 		loadFireballs();
 		loadBlocks();
+		loadCannons();
 		
 		keys = new boolean [KeyEvent.KEY_LAST + 1];
 
@@ -150,7 +153,7 @@ class GamePanel extends JPanel {
 		red = getPixelCol(mask, 75, 25); //for instant death areas
 		bronze = getPixelCol(mask, 125, 25); //regular coins
 		yellow = getPixelCol(mask, 175, 25); //star coins
-		black = getPixelCol(mask, 225, 25); //cannon
+		black = getPixelCol(mask, 225, 25);
     }
     
     public int getPixelCol(BufferedImage mask, int xx, int yy){
@@ -315,14 +318,35 @@ class GamePanel extends JPanel {
 	}
 	
 	public void checkFireballs(){
-		for (int i = 0; i < fireballs.size(); i++){
+		for(int i = 0; i < fireballs.size(); i++){
 			fireRect = new Rectangle(fireballs.get(i).getX() - man.getX(), fireballs.get(i).getY(), 50, 50);
-			if (fireRect.intersects(playerRect)){
+			if(fireRect.intersects(playerRect)){
 				man.takeDamage(1);
 			}
 		}
 	}
 	
+	public void drawFireball(Graphics2D g2,int x,int y){
+		AffineTransform saveXform = g2.getTransform();
+		AffineTransform at = new AffineTransform();
+		int w = fireball.getWidth(this);
+		int h = fireball.getHeight(this);
+		at.rotate(fireAng, x + w / 2, y + h / 2);
+		g2.transform(at);
+		g2.drawImage(fireball, x, y, this);
+		g2.setTransform(saveXform);		
+	}
+	///////////////////////////////////////////CANNONS///////////////////////////////////
+	public void loadCannons(){
+		for(int i = 0; i < 500; i++){
+			for(int j = 0; j < 20; j++){
+				if(getPixelCol(fireMask, i * 50, j * 50) == black && i != 1){
+					cannons.add(new Cannon(i * 50 - 25, j * 50, 1000 - j * 50));
+				}
+			}
+		}
+	}
+	//////////////////////////////////////////////////////////////////////////////
 	public void moveLava(){
 		if (lavaX >= 0){
 			lavaX = -1900; //move both pictures to the front again (so there is a constant flow of lava)
@@ -342,7 +366,7 @@ class GamePanel extends JPanel {
 			if(enemy.getX() > man.getX() - 1200 && enemy.getX() < man.getX() + 1200){
 				enemies.remove(enemy);
 			}
-			int d = Math.abs(man.getX() - enemy.getX());
+			int d = Math.abs(man.getXPos() - enemy.getX());
 			if(d < 600){
 				enemy.chase(man);
 			}
@@ -353,52 +377,38 @@ class GamePanel extends JPanel {
 	}
 	
 	public void shootCannons(){
-		for(int i = 0; i < cannons.size(); i++){
-			Cannon cannon = cannons.get(i);
-			eArrows.add(cannon.shoot());
+		if(time >= cooldown){
+			for(int i = 0; i < cannons.size(); i++){
+				Cannon cannon = cannons.get(i);
+				eArrows.add(cannon.shoot(man));
+				time = 0;	
+			}
 		}
 		for(int i = 0; i < eArrows.size(); i++){
 			Arrow arrow = eArrows.get(i);
 			int d = Math.abs(man.getX() - arrow.getX());
 			if(d > 2000){
 				eArrows.remove(arrow);
+				i++;
 			}
 			arrow.move();
 			for(int j = 0; j < blocks.size(); j++){
 				Block block = blocks.get(j);
 				if(arrow.getRect(man).intersects(block.getRect())){
 					eArrows.remove(arrow);
+					i++;
 				}
 			}
-			if(arrow.getRect(man).intersects(RealRect)){
+			if(arrow.getRealRect(man).intersects(RealRect)){
+				System.out.println("hit");
+				System.out.println(arrow.getX());
+				System.out.println(man.getX());
 				eArrows.remove(arrow);
+				man.takeDamage(arrow.getDamage());
+				i++;
 			}
 		}
-	}
-	
-	public void shoot(){
-		if(keys[KeyEvent.VK_ENTER]){
-			if(time > cooldown){
-				arrows.add(man.shoot(man.damage()));		
-				time = 0;
-			}
-		}
-		for(int i = 0; i < arrows.size(); i++){
-			Arrow arrow = arrows.get(i);
-			int d = Math.abs(man.getXPos() - arrow.getX());
-			if(d > 960){
-				arrows.remove(arrow);
-			}
-			arrow.move();
-			for(int j = 0; j < blocks.size(); j++){
-				Block block = blocks.get(j);
-				if(arrow.getRect(man).intersects(block.getRect())){
-					arrows.remove(arrow);
-				}
-			}
-		}
-		time += 1;
-		
+		time++;
 	}
 	
 	public void refresh(){
@@ -409,11 +419,11 @@ class GamePanel extends JPanel {
 		moveLava();
 		jumpFireballs();
 		checkFireballs();
+		fireAng += 0.1;
 		checkCoin();
 		checkStarCoin();
 		coinFrameIncrease();
 		starCoinFrameIncrease();
-		shoot();
 		renderEnemies();
 		shootCannons();
 	}
@@ -422,7 +432,7 @@ class GamePanel extends JPanel {
 		Graphics2D g2 = (Graphics2D) g;
 		g.drawImage(test, -man.getX(), 0, this);
 		for (int i = 0; i < fireballs.size(); i++){
-			g.drawImage(fireball, fireballs.get(i).getX() - man.getX(), fireballs.get(i).getY(), this); //displays all star coins (that have not been picked up yet)
+			drawFireball(g2, fireballs.get(i).getX() - man.getX(), fireballs.get(i).getY());
 		}
 		for (int i = 0; i < 15; i++){ //blitting lava across the entire map
 			g.drawImage(lava, (int) lavaX - man.getX() + 1900 * i, 900, this);
@@ -442,10 +452,10 @@ class GamePanel extends JPanel {
 		for (int i = 0; i < allStarCoins.size(); i++){
 			g.drawImage(starCoinImages[allStarCoins.get(i).getFrame()], allStarCoins.get(i).getX() - man.getX(), allStarCoins.get(i).getNewY(), this); //displays all star coins (that have not been picked up yet)
 		}
-		for(int i = 0; i < arrows.size(); i++){
-    		Arrow arrow = arrows.get(i);
-    		g.setColor(new Color(100, 150, 100));
-    		g.fillRect(arrow.getX(), arrow.getY() + 20, 30, 6);
+    	for(int i = 0; i < cannons.size(); i++){
+    		Cannon cannon = cannons.get(i);
+    		g.setColor(new Color(0, 0, 0));
+    		g.fillRect(cannon.getX() - man.getX(), cannon.getY(), 50, 50);
     	}
     	for(int i = 0; i < enemies.size(); i++){
     		g.setColor(new Color(255, 255, 255));
@@ -453,7 +463,7 @@ class GamePanel extends JPanel {
     	for(int i = 0; i < eArrows.size(); i++){
     		Arrow arrow = eArrows.get(i);
     		g.setColor(new Color(100, 150, 100));
-    		g.fillRect(arrow.getX(), arrow.getY() + 20, 30, 6);
+    		g.fillRect(arrow.getX() - man.getX(), arrow.getY() + 20, 30, 6);
     	}
 		//////////////////////////////////////////////////////////////////////////////
 		g.setColor(new Color(255, 255, 255));

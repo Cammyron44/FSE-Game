@@ -27,6 +27,9 @@ class Arrow{
 	public Rectangle getRect(Player man){
 		return new Rectangle(x + man.getX(), y, width, height);
 	}
+	public Rectangle getRealRect(Player man){
+		return new Rectangle(x - man.getXPos(), y, width, height);
+	}
 	public int getDamage(){
 		return damage;
 	}

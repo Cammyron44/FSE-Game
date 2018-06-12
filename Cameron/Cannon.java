@@ -2,20 +2,22 @@
 import java.awt.*;
 
 class Cannon{
-	private int x, y, cooldown = 100, time = 0;
-	public Cannon(int x, int y){
+	private int x, y, xPos;
+	public Cannon(int x, int y, int xPos){
 		this.x = x;
 		this.y = y;
+		this.xPos = xPos;
 	}
-	public Arrow shoot(){
-		if(time >= cooldown){
-			time = 0;
-			time++;
-			return new Arrow(50, "left", x, y);	
-		}
-		else{
-			time++;
-			return null;
-		}
+	public Arrow shoot(Player man){
+		return new Arrow(25, "left", x, y);	
+	}
+	public int getX(){
+		return x;
+	}
+	public int getY(){
+		return y;
+	}
+	public int getXPos(){
+		return xPos;
 	}
 }
