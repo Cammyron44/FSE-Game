@@ -2,7 +2,7 @@
 import java.awt.*;
 
 class Arrow{
-	private int damage, x, y, width = 30, height = 6;
+	private int damage, x, y, width = 50, height = 25;
 	private String direction;
 	public Arrow(int damage, String direction, int x, int y){
 		this.damage = damage;
@@ -25,7 +25,11 @@ class Arrow{
 		return y;
 	}
 	public Rectangle getRect(Player man){
-		return new Rectangle(x + man.getX(), y, width, height);
+		return new Rectangle(x, y, width, height);
+	}
+	public Rectangle getRealRect(Player man){
+		//return new Rectangle(x - man.getXPos(), y, width, height);
+		return new Rectangle(x - man.getXPos(), y, width, height);
 	}
 	public int getDamage(){
 		return damage;
