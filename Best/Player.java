@@ -23,8 +23,9 @@ public class Player {
 	private boolean jump, ground;
 	int screenX = 1900;
 	int screenY = 1000;
-	private int platform, health;
-	private BufferedImage image = null;
+	private int green, black, health;
+	private BufferedImage mask = null;
+	private BufferedImage fireball = null;
 	
 	public Player(){
 		x = 0; //position of background image on screen
@@ -42,59 +43,61 @@ public class Player {
 	///////////////////////////////LOAD IMAGE//////////////////////////////////////
 	public void loadImage(){
 		try {
-    		image = ImageIO.read(new File("map1Mask.png"));
+    		mask = ImageIO.read(new File("map1Mask.png"));
+    		fireball = ImageIO.read(new File("map1Fireball.png"));
 		} 
 		catch (IOException e) {
 		}
-		platform = getPixelCol(image, 25, 25); //platform colour
+		green = getPixelCol(mask, 25, 25); //platform colour
+		black = getPixelCol(fireball, 225, 25);
     }
     ///////////////////////////////PIXEL COLOUR////////////////////////////////////
     public int getPixelCol(BufferedImage image, int xx, int yy){
     	return image.getRGB(xx + (int)x, yy);
     }
     
-    public boolean getColTop(BufferedImage image, int xx, int yy){
+    public boolean getColTop(BufferedImage image, int xx, int yy, int col){
     	boolean b = false;
     	int c = image.getRGB(xx + (int) x, yy);
     	for (int d = 0; d < 50; d++){
     		c = image.getRGB(d + xx + (int) x, yy);
-    		if (c == platform){
+    		if (c == col){
     			b = true;
     		}
     	}
     	return b;
     }
     
-    public boolean getColBottom(BufferedImage image, int xx, int yy){
+    public boolean getColBottom(BufferedImage image, int xx, int yy, int col){
     	boolean b = false;
     	int c = image.getRGB(xx + (int )x, yy + 100);
     	for (int d = 0; d < 50; d++){
     		c = image.getRGB(d + xx + (int) x, yy + 100);
-    		if (c == platform){
+    		if (c == col){
     			b = true;
     		}
     	}
     	return b;
     }
     
-    public boolean getColRight(BufferedImage image, int xx, int yy){
+    public boolean getColRight(BufferedImage image, int xx, int yy, int col){
     	boolean b = false;
     	int c = image.getRGB(xx + (int) x + 50, yy + 100);
     	for (int d = 0; d < 100; d++){
     		c = image.getRGB(xx + (int) x + 50, yy + d);
-    		if (c == platform){
+    		if (c == col){
     			b = true;
     		}
     	}
     	return b;
     }
     
-    public boolean getColLeft(BufferedImage image, int xx, int yy){
+    public boolean getColLeft(BufferedImage image, int xx, int yy, int col){
     	boolean b = false;
     	int c = image.getRGB(xx + (int) x - 1, yy + 100);
     	for (int d = 0; d < 100; d++){
     		c = image.getRGB(xx + (int) x - 1, yy + d);
-    		if (c == platform){
+    		if (c == col){
     			b = true;
     		}
     	}
@@ -104,7 +107,7 @@ public class Player {
 	public void jump(){
 		if (vy < 0){
 			for (int i = 0; i < (int) vy * -1; i++){
-				if (getColTop(image, (int) xPos, (int) yPos) == false){
+				if (getColTop(mask, (int) xPos, (int) yPos, green) == false){
 					yPos -= 1;
 					ground  = false;
 				}
@@ -116,7 +119,7 @@ public class Player {
 		}
 		else{
 			for (int i = 0; i < (int) vy; i++){
-				if (getColBottom(image, (int) xPos, (int) yPos) == false){
+				if (getColBottom(mask, (int) xPos, (int) yPos, green) == false){
 					yPos += 1;
 				}
 				else{
@@ -131,7 +134,7 @@ public class Player {
 	
 	public void fall(){
 		for (int i = 0; i < (int) vy; i++){
-				if (getColBottom(image, (int) xPos, (int) yPos) == false){
+				if (getColBottom(mask, (int) xPos, (int) yPos, green) == false){
 					yPos += 1;
 					ground = false;
 				}
@@ -151,7 +154,7 @@ public class Player {
 		if (d.equals("right")){
 			direction = "right";
 			for (int i = 0; i < (int) vx; i++){
-				if (getColRight(image, (int) xPos, (int) yPos) == false){
+				if (!getColRight(mask, (int) xPos, (int) yPos, green)){
 					if (xPos <= 890){
 						xPos += 1;//(int) vx;
 					}
@@ -169,7 +172,7 @@ public class Player {
 		else{
 			direction = "left";
 			for (int i = 0; i < (int) vx; i++){
-				if (getColLeft(image, (int) xPos, (int) yPos) == false){
+				if (!getColLeft(mask, (int) xPos, (int) yPos, green)){
 					if (xPos >= 910){
 						xPos -= 1;//(int) vx;
 					}
@@ -192,7 +195,7 @@ public class Player {
 		}
 		if (d.equals("right")){
 			direction = "right";
-			if (getColRight(image, (int) xPos + (int) vx, (int) yPos) == false){
+			if (!getColRight(mask, (int) xPos + (int) vx, (int) yPos, green)){
 				if (xPos <= 890){
 					xPos += (int) vx;
 				}
@@ -208,7 +211,7 @@ public class Player {
 		}
 		else{
 			direction = "left";
-			if (getColLeft(image, (int) xPos - (int) vx, (int) yPos) == false){
+			if (!getColLeft(mask, (int) xPos - (int) vx, (int) yPos, green)){
 				if (xPos >= 910){
 					xPos -= (int) vx;
 				}

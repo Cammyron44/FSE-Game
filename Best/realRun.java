@@ -244,6 +244,7 @@ class GamePanel extends JPanel {
     		if (playerRect.intersects(heartRect)){ //player picks up coin			
     			hearts.remove(hearts.get(i));
     			man.addHealth(50);
+    			System.out.println("healed");
     		}
     		
     	}
@@ -558,6 +559,9 @@ class GamePanel extends JPanel {
 		for (int i = 0; i < allStarCoins.size(); i++){
 			g.drawImage(starCoinImages[allStarCoins.get(i).getFrame()], allStarCoins.get(i).getX() - man.getX(), allStarCoins.get(i).getNewY(), this); //displays all star coins (that have not been picked up yet)
 		}
+		for (int i = 0; i < hearts.size(); i++){
+			g.drawImage(heart, hearts.get(i).getX() - man.getX(), hearts.get(i).getY(), this); //displays all star coins (that have not been picked up yet)
+		}
     	for(int i = 0; i < cannons.size(); i++){
     		Cannon cannon = cannons.get(i);
     		g.drawImage(cannonPic, cannon.getX() - man.getX(), cannon.getY(), this);
@@ -566,10 +570,6 @@ class GamePanel extends JPanel {
     		Arrow arrow = eArrows.get(i);
     		g.drawImage(bullet, arrow.getX() - man.getX(), arrow.getY(), this);
     	}
-    	for (int i = 0; i < hearts.size(); i++){
-            g.drawImage(heart, hearts.get(i).getX() - man.getX(), hearts.get(i).getY(), this); //displays all star coins (that have not been picked up yet)
-        }
-    	
     	
     	if (playerAction.equals("stand") && playerDirection.equals("right")){
     		g.drawImage(manImages[8 + (int) manFrame], man.getXPos(), man.getYPos() + 19, this);
