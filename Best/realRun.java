@@ -230,7 +230,7 @@ class GamePanel extends JPanel {
 		hearts = new ArrayList <Heart>();
     	for (int i = 0; i < 500; i++){
 			for (int j = 0; j < 20; j++){
-				if (getPixelCol(mask, i * 50, j * 50) == darkRed && && j != 0){
+				if (getPixelCol(mask, i * 50, j * 50) == darkRed && j != 0){
 					Heart h = new Heart(i * 50, j * 50);
 					hearts.add(h); 
 				}
@@ -244,7 +244,6 @@ class GamePanel extends JPanel {
     		if (playerRect.intersects(heartRect)){ //player picks up coin			
     			hearts.remove(hearts.get(i));
     			man.addHealth(50);
-    			System.out.println("healed");
     		}
     		
     	}
@@ -567,6 +566,9 @@ class GamePanel extends JPanel {
     		Arrow arrow = eArrows.get(i);
     		g.drawImage(bullet, arrow.getX() - man.getX(), arrow.getY(), this);
     	}
+    	for (int i = 0; i < hearts.size(); i++){
+            g.drawImage(heart, hearts.get(i).getX() - man.getX(), hearts.get(i).getY(), this); //displays all star coins (that have not been picked up yet)
+        }
     	
     	
     	if (playerAction.equals("stand") && playerDirection.equals("right")){
