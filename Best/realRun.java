@@ -244,9 +244,7 @@ class GamePanel extends JPanel {
     		if (playerRect.intersects(heartRect)){ //player picks up coin			
     			hearts.remove(hearts.get(i));
     			man.addHealth(50);
-    			System.out.println("healed");
     		}
-    		
     	}
 	}
 	////////////////////////////////////BLOCKS/////////////////////////////////////
@@ -562,32 +560,40 @@ class GamePanel extends JPanel {
 		for (int i = 0; i < hearts.size(); i++){
 			g.drawImage(heart, hearts.get(i).getX() - man.getX(), hearts.get(i).getY(), this); //displays all star coins (that have not been picked up yet)
 		}
+		for(int i = 0; i < eArrows.size(); i++){
+    		Arrow arrow = eArrows.get(i);
+    		g.drawImage(bullet, arrow.getX() - man.getX(), arrow.getY(), this);
+    	}
     	for(int i = 0; i < cannons.size(); i++){
     		Cannon cannon = cannons.get(i);
     		g.drawImage(cannonPic, cannon.getX() - man.getX(), cannon.getY(), this);
     	}
-    	for(int i = 0; i < eArrows.size(); i++){
-    		Arrow arrow = eArrows.get(i);
-    		g.drawImage(bullet, arrow.getX() - man.getX(), arrow.getY(), this);
-    	}
     	
+    
+	
     	if (playerAction.equals("stand") && playerDirection.equals("right")){
     		g.drawImage(manImages[8 + (int) manFrame], man.getXPos(), man.getYPos() + 19, this);
     	}
     	else if (playerAction.equals("stand") && playerDirection.equals("left")){
-    		g.drawImage(manImages[8 + (int) manFrame], man.getXPos(), man.getYPos() + 19, this);
+    		int w = manImages[8 + (int) manFrame].getWidth(this);
+			int h = manImages[8 + (int) manFrame].getHeight(this);
+    		g.drawImage(manImages[8 + (int) manFrame], man.getXPos() + 50, man.getYPos() + 19, - w, h, this);
     	}
     	else if (playerAction.equals("run") && playerDirection.equals("right")){
     		g.drawImage(manImages[(int) manFrame], man.getXPos() - 10, man.getYPos() + 25, this);
     	}
     	else if (playerAction.equals("run") && playerDirection.equals("left")){
-    		g.drawImage(manImages[(int) manFrame], man.getXPos() - 10, man.getYPos() + 25, this);
+    		int w = manImages[(int) manFrame].getWidth(this);
+			int h = manImages[(int) manFrame].getHeight(this);
+    		g.drawImage(manImages[(int) manFrame], man.getXPos() + 50, man.getYPos() + 19, - w, h, this);
     	}
-    	else if (playerAction.equals("jump") || playerAction.equals("fall") && playerDirection.equals("right")){
+    	else if ((playerAction.equals("jump") || playerAction.equals("fall")) && playerDirection.equals("right")){
     		g.drawImage(manImages[34 + (int) manFrame], man.getXPos(), man.getYPos(), this);
     	}
-    	else if (playerAction.equals("jump") || playerAction.equals("fall") && playerDirection.equals("left")){
-    		g.drawImage(manImages[34 + (int) manFrame], man.getXPos(), man.getYPos(), this);
+    	else if ((playerAction.equals("jump") || playerAction.equals("fall")) && playerDirection.equals("left")){
+    		int w = manImages[34 + (int) manFrame].getWidth(this);
+			int h = manImages[34 + (int) manFrame].getHeight(this);
+    		g.drawImage(manImages[34 + (int) manFrame], man.getXPos() + 50, man.getYPos() + 19, - w, h, this);
     	}
 		//////////////////////////////////////HEALTH BAR/////////////////////////////////////
 		g.setColor(new Color(255, 255, 255));
