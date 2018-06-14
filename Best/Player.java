@@ -27,7 +27,7 @@ public class Player {
 	private int green, black, red;
 	private BufferedImage mask = null;
 	
-	public Player(BufferedImage mask){
+	public Player(){
 		x = 0; //position of background image on screen
 		xPos = 100; //player X
 		yPos = 400; //player Y
@@ -35,7 +35,6 @@ public class Player {
 		vy = 0;
 		direction = "right";
 		jump = false;
-		this.mask = mask;
 		loadImage();
 		ground = true;
 		lives = 1;
@@ -44,6 +43,11 @@ public class Player {
 	}
 	///////////////////////////////LOAD IMAGE//////////////////////////////////////
 	public void loadImage(){
+		try {
+    		mask = ImageIO.read(new File("map1Mask.png"));
+		} 
+		catch (IOException e) {
+		}
 		green = getPixelCol(mask, 25, 25); //platform colour
 		red = getPixelCol(mask, 75, 25); //lava
 		black = getPixelCol(mask, 225, 25); //cannons

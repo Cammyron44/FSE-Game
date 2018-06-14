@@ -106,7 +106,6 @@ class GamePanel extends JPanel {
 	private double manFrame;
 	
 	private BufferedImage mask = null;
-	private BufferedImage fireMask = null;
 	
 	int green, red, bronze, yellow, black, darkRed;
 	
@@ -202,7 +201,6 @@ class GamePanel extends JPanel {
 	public void loadImage(){
 		try {
     		mask = ImageIO.read(new File("map1Mask.png"));
-    		fireMask = ImageIO.read(new File("map1Fireball.png"));
 		} 
 		catch (IOException e) {
 		}
@@ -443,7 +441,7 @@ class GamePanel extends JPanel {
 		fireballs = new ArrayList<Fireball>();
 		for (int i = 0; i < 500; i++){
 			for (int j = 0; j < 20; j++){
-				if (getPixelCol(fireMask, i * 50, j * 50) == red && i != 1){ //cannot be 2 because on the mask that space is the base colour (we dont want a coin being created there)
+				if (getPixelCol(mask, i * 50, j * 50) == red && j != 0){ //cannot be 2 because on the mask that space is the base colour (we dont want a coin being created there)
 					///fireballs.add(new Fireball(i * 50 - 25, j * 50)); //wherever there is a bronze space on the mask, create a coin object there
 					fireballs.add(new Fireball(i * 50 - 25, 900, 1000 - j * 50));
 				}
@@ -486,7 +484,7 @@ class GamePanel extends JPanel {
 	public void loadCannons(){
 		for(int i = 0; i < 500; i++){
 			for(int j = 0; j < 20; j++){
-				if(getPixelCol(fireMask, i * 50, j * 50) == black && i != 1){
+				if(getPixelCol(mask, i * 50, j * 50) == black && j != 0){
 					cannons.add(new Cannon(i * 50, j * 50, 1000 - j * 50));
 				}
 			}
@@ -752,7 +750,9 @@ class GamePanel extends JPanel {
 			g.setColor(new Color(255, 255, 255));
 			g2.fillRect(645, 25, 610, 60);
 			g.setColor(new Color(255, 0, 0));
-			g2.fill(healthRect);
+			if (healthRect != null){
+				g2.fill(healthRect);
+			}
 			g.setColor(new Color (0, 0, 0));
 			/////////////////////////////////////HEALTH NUM//////////////////////////////
 			String s = "" + man.getHealth(); //add "" so it creates the string Integer.parseInt() and .toString() did not work)
