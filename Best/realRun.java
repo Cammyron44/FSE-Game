@@ -60,15 +60,22 @@ public class realRun extends JFrame implements ActionListener, KeyListener {
 
 class GamePanel extends JPanel {
 	
+	private boolean[] keys;
 	private int screenX = 1900;
 	private int screenY = 1000;
-	private boolean[] keys;
-	private Image back, backMask, test, map1, lava;
+	private int menuCountR = 0;
+	private int menuCountC = 0;
+	private String screen = "menu";
+	private Image titleText, playText, controlsText, creditsText, camJackText, quitText, backSpaceText;
+
+	private Image back, backMask, test, map1, lava, castle;
 	private double lavaX;
 	private int time = 0, cooldown = 125;
 	private Rectangle playerRect, healthRect;
 	Player man;
 	String playerDirection, playerAction;
+	
+	Rectangle levelCompleteRect;
 	
 	int starCoinCount = 0;
 	Integer coin, starCoin;
@@ -104,6 +111,23 @@ class GamePanel extends JPanel {
 	int green, red, bronze, yellow, black, darkRed;
 	
 	public GamePanel(){
+		/////////////////////////////////MENU////////////////////////////////////////////////
+		titleText = new ImageIcon("menuText/titleText.png").getImage();
+		playText = new ImageIcon("menuText/playText.png").getImage();
+		playText = playText.getScaledInstance(300, 100, Image.SCALE_SMOOTH);
+		controlsText = new ImageIcon("menuText/controlsText.png").getImage();
+		controlsText = controlsText.getScaledInstance(300, 100, Image.SCALE_SMOOTH);
+		creditsText = new ImageIcon("menuText/creditsText.png").getImage();
+		creditsText = creditsText.getScaledInstance(300, 100, Image.SCALE_SMOOTH);
+		quitText = new ImageIcon("menuText/quitText.png").getImage();
+		quitText = quitText.getScaledInstance(300, 100, Image.SCALE_SMOOTH);
+		backSpaceText = new ImageIcon("menuText/backSpaceText.png").getImage();
+		//backSpaceText = backSpaceText
+		///////////////////////////////////////PLAY///////////////////////////////////////////
+		/////////////////////////////////////CONTROLS/////////////////////////////////////////
+		camJackText = new ImageIcon("menuText/camJackText.png").getImage();
+		/////////////////////////////////////CREDITS//////////////////////////////////////////
+		//////////////////////////////////////////////////////////////////////////////////////
 		
 		loadImage();
 		loadHearts();
@@ -128,7 +152,10 @@ class GamePanel extends JPanel {
 		
 		lava = new ImageIcon("lava.png").getImage();
 		lavaX = -1900;
-
+		
+		castle = new ImageIcon("castle.png").getImage();
+		castle = castle.getScaledInstance((int) (castle.getWidth(null) * 2), (int) (castle.getHeight(null) * 2), Image.SCALE_SMOOTH);
+		
 		playerDirection = "right";
 		
 		man = new Player();
@@ -520,113 +547,215 @@ class GamePanel extends JPanel {
 	}
 	
 	public void refresh(){
-		playerRect = new Rectangle(man.getXPos(), man.getYPos(), 50, 100);
-		healthRect = new Rectangle(650, 30, (int)((double) man.getHealth()/100 * 600), 50);
-		RealRect = new Rectangle(man.getX(), man.getYPos(), 50, 100);
-		move();
-		moveLava();
-		checkHearts();
-		jumpFireballs();
-		checkFireballs();
-		fireAng += 0.1;
-		checkCoin();
-		checkStarCoin();
-		coinFrameIncrease();
-		starCoinFrameIncrease();
-		renderEnemies();
-		shootCannons();
-		if(man.getHealth() <= 0){
-			System.out.println("ded");
+		if (screen.equals("menu")){
+			if (keys[KeyEvent.VK_W]){
+				if (menuCountC == 1){
+					menuCountC = 0;
+				}
+			}
+			if (keys[KeyEvent.VK_A]){
+				if (menuCountR == 1){
+					menuCountR = 0;
+				}
+			}
+			if (keys[KeyEvent.VK_S]){
+				if (menuCountC == 0){
+					menuCountC = 1;
+				}
+			}
+			if (keys[KeyEvent.VK_D]){
+				if (menuCountR == 0){
+					menuCountR = 1;
+				}
+			}
+			if (keys[KeyEvent.VK_ENTER]){
+				if (menuCountR == 0){
+					if (menuCountC == 0){
+						screen = "game";
+					}
+					else{
+						screen = "credits";
+					}
+				}
+				else{
+					if (menuCountC == 0){
+						screen = "controls";
+					}
+					else{
+						screen = "quit";
+					}
+				}
+				menuCountR = 0;
+				menuCountC = 0;
+			}
+		}
+		else if (screen.equals("play")){
+			if (keys[KeyEvent.VK_BACK_SPACE]){
+				screen = "menu";
+			}
+		}
+		else if (screen.equals("controls")){
+			if (keys[KeyEvent.VK_BACK_SPACE]){
+				screen = "menu";
+			}
+		}
+		else if (screen.equals("credits")){
+			if (keys[KeyEvent.VK_BACK_SPACE]){
+				screen = "menu";
+			}
+		}
+		else if (screen.equals("quit")){
+			System.exit(0);
+		}
+		else if (screen.equals("game")){
+			playerRect = new Rectangle(man.getXPos(), man.getYPos(), 50, 100);
+			healthRect = new Rectangle(650, 30, (int)((double) man.getHealth()/100 * 600), 50);
+			RealRect = new Rectangle(man.getX(), man.getYPos(), 50, 100);
+			levelCompleteRect = new Rectangle(25000 - screenX/2 - 5 - man.getX(), 0, 10, 1000);
+			move();
+			moveLava();
+			checkHearts();
+			jumpFireballs();
+			checkFireballs();
+			fireAng += 0.1;
+			checkCoin();
+			checkStarCoin();
+			coinFrameIncrease();
+			starCoinFrameIncrease();
+			renderEnemies();
+			shootCannons();
+			if(man.getHealth() <= 0){
+				System.out.println("ded");
+			}
+			if (playerRect.intersects(levelCompleteRect)){
+				screen = "level complete";
+			}
 		}
 	}
 		
 	public void paintComponent(Graphics g){
 		Graphics2D g2 = (Graphics2D) g;
-		g.drawImage(test, -man.getX(), 0, this);
-		for (int i = 0; i < fireballs.size(); i++){
-			drawFireball(g2, fireballs.get(i).getX() - man.getX(), fireballs.get(i).getY());
+		if (screen.equals("menu")){
+			g.drawImage(test, 0, 0, this);
+			g.setColor(new Color(0, 0, 0));
+			g2.setStroke(new BasicStroke(5));
+			g.drawImage(titleText, screenX/2 - titleText.getWidth(null)/2, 100, this);
+			g.drawImage(playText, 625, 500, this);
+			g.drawImage(controlsText, 975, 500, this);
+			g.drawImage(creditsText, 625, 650, this);
+			g.drawImage(quitText, 975, 650, this);
+			g.drawRect(625 + menuCountR * 350, 500 + menuCountC * 150 , 300, 100);
 		}
-		for (int i = 0; i < 15; i++){ //blitting lava across the entire map
-			g.drawImage(lava, (int) lavaX - man.getX() + 1900 * i, 900, this);
+		else if (screen.equals("play")){
+			g.drawImage(test, 0, 0, this);
+			g.drawImage(backSpaceText, screenX - backSpaceText.getWidth(null) - 10 , 10, this);
 		}
-		g.drawImage(map1, -man.getX(), 0, this);
-		g.setColor(new Color(0, 0, 0));
-		//g2.fill(playerRect);
+		else if (screen.equals("controls")){
+			g.drawImage(test, 0, 0, this);
+			g.drawImage(backSpaceText, screenX - backSpaceText.getWidth(null) - 10 , 10, this);
+		}
+		else if (screen.equals("credits")){
+			g.drawImage(test, 0, 0, this);
+			g.drawImage(camJackText, screenX/2 - camJackText.getWidth(null)/2, screenY/2 - camJackText.getHeight(null)/2, this);
+			g.drawImage(backSpaceText, screenX - backSpaceText.getWidth(null) - 10 , 10, this);
+		}
+		else if (screen.equals("game")){
+			g.drawImage(test, -man.getX(), 0, this);
+			g.drawImage(castle, 25000 - screenX/2 - castle.getWidth(null)/2 - man.getX(), 135 , this);
+			for (int i = 0; i < fireballs.size(); i++){
+				drawFireball(g2, fireballs.get(i).getX() - man.getX(), fireballs.get(i).getY());
+			}
+			for (int i = 0; i < 15; i++){ //blitting lava across the entire map
+				g.drawImage(lava, (int) lavaX - man.getX() + 1900 * i, 900, this);
+			}
+			g.drawImage(map1, -man.getX(), 0, this);
+			g.setColor(new Color(0, 0, 0));
+			//g2.fill(playerRect);
+			
+			g.drawImage(coinBig, 1325, 25 , this);
+			String c = "";
+			if (coinCount >= 0 && coinCount <= 9){
+				c = "x00" + coinCount; //add "" so it creates the string Integer.parseInt() and .toString() did not work)
+			}
+			else if (coinCount >= 10 && coinCount <= 99){
+				c = "x0" + coinCount;
+			}
+			else{
+				c = "x" + coinCount;
+			}
+	    	g.setFont(new Font("Arial", Font.PLAIN, 50));
+			g.drawString(c, 1460 - g.getFontMetrics().stringWidth(c) / 2, 73); //drawing an centering text
+			
+			for (int i = 0; i < 3; i++){
+				g.drawImage(starCoinBW, 1460 + ((i + 1) * 110), 10 , this); //black and white images of coins (meaning they havent been picked up yet)
+			}
+			for (int i = 0; i < starCoinsPicked.size(); i++){
+				g.drawImage(starCoinSmall, 1460 + ((starCoinsPicked.get(i).getNum() + 1) * 110), 10 , this); //when the coins have been picked up (displays which one you have picked up)
+			}
+			for (int i = 0; i < allCoins.size(); i++){
+				g.drawImage(coinImages[allCoins.get(i).getFrame()], allCoins.get(i).getX() - man.getX(), allCoins.get(i).getNewY(), this); //displays all regular coins
+			}
+			for (int i = 0; i < allStarCoins.size(); i++){
+				g.drawImage(starCoinImages[allStarCoins.get(i).getFrame()], allStarCoins.get(i).getX() - man.getX(), allStarCoins.get(i).getNewY(), this); //displays all star coins (that have not been picked up yet)
+			}
+			for (int i = 0; i < hearts.size(); i++){
+				g.drawImage(heart, hearts.get(i).getX() - man.getX(), hearts.get(i).getY(), this); //displays all star coins (that have not been picked up yet)
+			}
+			for(int i = 0; i < eArrows.size(); i++){
+	    		Arrow arrow = eArrows.get(i);
+	    		g.drawImage(bullet, arrow.getX() - man.getX(), arrow.getY(), this);
+	    	}
+	    	for(int i = 0; i < cannons.size(); i++){
+	    		Cannon cannon = cannons.get(i);
+	    		g.drawImage(cannonPic, cannon.getX() - man.getX(), cannon.getY(), this);
+	    	}
 		
-		g.drawImage(coinBig, 1325, 25 , this);
-		String c = "";
-		if (coinCount >= 0 && coinCount <= 9){
-			c = "x00" + coinCount; //add "" so it creates the string Integer.parseInt() and .toString() did not work)
+	    	if (playerAction.equals("stand") && playerDirection.equals("right")){
+	    		g.drawImage(manImages[8 + (int) manFrame], man.getXPos(), man.getYPos() + 19, this);
+	    	}
+	    	else if (playerAction.equals("stand") && playerDirection.equals("left")){
+	    		int w = manImages[8 + (int) manFrame].getWidth(this);
+				int h = manImages[8 + (int) manFrame].getHeight(this);
+	    		g.drawImage(manImages[8 + (int) manFrame], man.getXPos() + 50, man.getYPos() + 19, - w, h, this);
+	    	}
+	    	else if (playerAction.equals("run") && playerDirection.equals("right")){
+	    		g.drawImage(manImages[(int) manFrame], man.getXPos() - 10, man.getYPos() + 25, this);
+	    	}
+	    	else if (playerAction.equals("run") && playerDirection.equals("left")){
+	    		int w = manImages[(int) manFrame].getWidth(this);
+				int h = manImages[(int) manFrame].getHeight(this);
+	    		g.drawImage(manImages[(int) manFrame], man.getXPos() + 50, man.getYPos() + 19, - w, h, this);
+	    	}
+	    	else if ((playerAction.equals("jump") || playerAction.equals("fall")) && playerDirection.equals("right")){
+	    		g.drawImage(manImages[34 + (int) manFrame], man.getXPos(), man.getYPos(), this);
+	    	}
+	    	else if ((playerAction.equals("jump") || playerAction.equals("fall")) && playerDirection.equals("left")){
+	    		int w = manImages[34 + (int) manFrame].getWidth(this);
+				int h = manImages[34 + (int) manFrame].getHeight(this);
+	    		g.drawImage(manImages[34 + (int) manFrame], man.getXPos() + 50, man.getYPos() + 19, - w, h, this);
+	    	}
+			//////////////////////////////////////HEALTH BAR/////////////////////////////////////
+			g.setColor(new Color(255, 255, 255));
+			g2.fillRect(645, 25, 610, 60);
+			g.setColor(new Color(255, 0, 0));
+			g2.fill(healthRect);
+			g.setColor(new Color (0, 0, 0));
+			/////////////////////////////////////HEALTH NUM//////////////////////////////
+			String s = "" + man.getHealth(); //add "" so it creates the string Integer.parseInt() and .toString() did not work)
+	    	g.setFont(new Font("Arial", Font.PLAIN, 50));
+			g.drawString(s, screenX / 2 - g.getFontMetrics().stringWidth(s) / 2, 73); //drawing an centering text
+			//g2.fill(levelCompleteRect); level end rect
 		}
-		else if (coinCount >= 10 && coinCount <= 99){
-			c = "x0" + coinCount;
+		else if (screen.equals("level complete")){
+			if (manFrame < 4){
+				manFrame += 0.05;
+			}
+			else{
+				manFrame = 0;		
+			}
+			g.drawImage(castle, 25000 - screenX/2 - castle.getWidth(null)/2 - man.getX(), 135 , this);
+			g.drawImage(map1, -man.getX(), 0, this);
+			g.drawImage(manImages[8 + (int) manFrame], man.getXPos(), man.getYPos() + 19, this);
 		}
-		else{
-			c = "x" + coinCount;
-		}
-    	g.setFont(new Font("Arial", Font.PLAIN, 50));
-		g.drawString(c, 1460 - g.getFontMetrics().stringWidth(c) / 2, 73); //drawing an centering text
-		
-		
-		for (int i = 0; i < 3; i++){
-			g.drawImage(starCoinBW, 1460 + ((i + 1) * 110), 10 , this); //black and white images of coins (meaning they havent been picked up yet)
-		}
-		for (int i = 0; i < starCoinsPicked.size(); i++){
-			g.drawImage(starCoinSmall, 1460 + ((starCoinsPicked.get(i).getNum() + 1) * 110), 10 , this); //when the coins have been picked up (displays which one you have picked up)
-		}
-		for (int i = 0; i < allCoins.size(); i++){
-			g.drawImage(coinImages[allCoins.get(i).getFrame()], allCoins.get(i).getX() - man.getX(), allCoins.get(i).getNewY(), this); //displays all regular coins
-		}
-		for (int i = 0; i < allStarCoins.size(); i++){
-			g.drawImage(starCoinImages[allStarCoins.get(i).getFrame()], allStarCoins.get(i).getX() - man.getX(), allStarCoins.get(i).getNewY(), this); //displays all star coins (that have not been picked up yet)
-		}
-		for (int i = 0; i < hearts.size(); i++){
-			g.drawImage(heart, hearts.get(i).getX() - man.getX(), hearts.get(i).getY(), this); //displays all star coins (that have not been picked up yet)
-		}
-		for(int i = 0; i < eArrows.size(); i++){
-    		Arrow arrow = eArrows.get(i);
-    		g.drawImage(bullet, arrow.getX() - man.getX(), arrow.getY(), this);
-    	}
-    	for(int i = 0; i < cannons.size(); i++){
-    		Cannon cannon = cannons.get(i);
-    		g.drawImage(cannonPic, cannon.getX() - man.getX(), cannon.getY(), this);
-    	}
-    	
-    
-	
-    	if (playerAction.equals("stand") && playerDirection.equals("right")){
-    		g.drawImage(manImages[8 + (int) manFrame], man.getXPos(), man.getYPos() + 19, this);
-    	}
-    	else if (playerAction.equals("stand") && playerDirection.equals("left")){
-    		int w = manImages[8 + (int) manFrame].getWidth(this);
-			int h = manImages[8 + (int) manFrame].getHeight(this);
-    		g.drawImage(manImages[8 + (int) manFrame], man.getXPos() + 50, man.getYPos() + 19, - w, h, this);
-    	}
-    	else if (playerAction.equals("run") && playerDirection.equals("right")){
-    		g.drawImage(manImages[(int) manFrame], man.getXPos() - 10, man.getYPos() + 25, this);
-    	}
-    	else if (playerAction.equals("run") && playerDirection.equals("left")){
-    		int w = manImages[(int) manFrame].getWidth(this);
-			int h = manImages[(int) manFrame].getHeight(this);
-    		g.drawImage(manImages[(int) manFrame], man.getXPos() + 50, man.getYPos() + 19, - w, h, this);
-    	}
-    	else if ((playerAction.equals("jump") || playerAction.equals("fall")) && playerDirection.equals("right")){
-    		g.drawImage(manImages[34 + (int) manFrame], man.getXPos(), man.getYPos(), this);
-    	}
-    	else if ((playerAction.equals("jump") || playerAction.equals("fall")) && playerDirection.equals("left")){
-    		int w = manImages[34 + (int) manFrame].getWidth(this);
-			int h = manImages[34 + (int) manFrame].getHeight(this);
-    		g.drawImage(manImages[34 + (int) manFrame], man.getXPos() + 50, man.getYPos() + 19, - w, h, this);
-    	}
-		//////////////////////////////////////HEALTH BAR/////////////////////////////////////
-		g.setColor(new Color(255, 255, 255));
-		g2.fillRect(645, 25, 610, 60);
-		g.setColor(new Color(255, 0, 0));
-		g2.fill(healthRect);
-		g.setColor(new Color (0, 0, 0));
-		/////////////////////////////////////HEALTH NUM//////////////////////////////
-		String s = "" + man.getHealth(); //add "" so it creates the string Integer.parseInt() and .toString() did not work)
-    	g.setFont(new Font("Arial", Font.PLAIN, 50));
-		g.drawString(s, screenX / 2 - g.getFontMetrics().stringWidth(s) / 2, 73); //drawing an centering text
 	}
 }

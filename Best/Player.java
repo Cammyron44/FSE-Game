@@ -110,7 +110,7 @@ public class Player {
 	public void jump(){
 		if (vy < 0){
 			for (int i = 0; i < (int) vy * -1; i++){
-				if (!getColTop(mask, (int) xPos, (int) yPos, green) && !getColTop(mask, (int) xPos, (int) yPos, black)){
+				if (!getColTop(mask, (int) xPos, (int) yPos, green) && !getColTop(fireball, (int) xPos, (int) yPos, black)){
 					yPos -= 1;
 					ground  = false;
 				}
@@ -122,7 +122,7 @@ public class Player {
 		}
 		else{
 			for (int i = 0; i < (int) vy; i++){
-				if (!getColBottom(mask, (int) xPos, (int) yPos, green) && !getColBottom(mask, (int) xPos, (int) yPos, black)){
+				if (!getColBottom(mask, (int) xPos, (int) yPos, green) && !getColBottom(fireball, (int) xPos, (int) yPos, black)){
 					yPos += 1;
 				}
 				else{
@@ -140,7 +140,7 @@ public class Player {
 	
 	public void fall(){
 		for (int i = 0; i < (int) vy; i++){
-			if (!getColBottom(mask, (int) xPos, (int) yPos, green) && !getColBottom(mask, (int) xPos, (int) yPos, black)){
+			if (!getColBottom(mask, (int) xPos, (int) yPos, green) && !getColBottom(fireball, (int) xPos, (int) yPos, black)){
 				yPos += 1;
 				ground = false;
 			}
@@ -163,7 +163,7 @@ public class Player {
 		if (d.equals("right")){
 			direction = "right";
 			for (int i = 0; i < (int) vx; i++){
-				if (!getColRight(mask, (int) xPos, (int) yPos, green) && !getColRight(mask, (int) xPos, (int) yPos, black)){
+				if (!getColRight(mask, (int) xPos, (int) yPos, green) && !getColRight(fireball, (int) xPos, (int) yPos, black)){
 					if (xPos <= 890){
 						xPos += 1;//(int) vx;
 					}
@@ -181,7 +181,7 @@ public class Player {
 		else{
 			direction = "left";
 			for (int i = 0; i < (int) vx; i++){
-				if (!getColLeft(mask, (int) xPos, (int) yPos, green) && !getColLeft(mask, (int) xPos, (int) yPos, black)){
+				if (!getColLeft(mask, (int) xPos, (int) yPos, green) && !getColLeft(fireball, (int) xPos, (int) yPos, black)){
 					if (xPos >= 910){
 						xPos -= 1;//(int) vx;
 					}
@@ -207,7 +207,7 @@ public class Player {
 		}
 		if (d.equals("right")){
 			direction = "right";
-			if (!getColRight(mask, (int) xPos + (int) vx, (int) yPos, green) && !getColRight(mask, (int) xPos, (int) yPos, black)){
+			if (!getColRight(mask, (int) xPos + (int) vx, (int) yPos, green) && !getColRight(fireball, (int) xPos, (int) yPos, black)){
 				if (xPos <= 890){
 					xPos += (int) vx;
 				}
@@ -223,7 +223,7 @@ public class Player {
 		}
 		else{
 			direction = "left";
-			if (!getColLeft(mask, (int) xPos - (int) vx, (int) yPos, green) && !getColLeft(mask, (int) xPos, (int) yPos, black)){
+			if (!getColLeft(mask, (int) xPos - (int) vx, (int) yPos, green) && !getColLeft(fireball, (int) xPos, (int) yPos, black)){
 				if (xPos >= 910){
 					xPos -= (int) vx;
 				}
