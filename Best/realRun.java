@@ -72,11 +72,12 @@ class GamePanel extends JPanel {
 	
 	int starCoinCount = 0;
 	Integer coin, starCoin;
-	Image coinImage, starCoinImage, starCoinBW, starCoinSmall, cannonPic, bullet;
+	Image coinBig, coinImage, starCoinImage, starCoinBW, starCoinSmall, cannonPic, bullet;
 	Image[] coinImages, starCoinImages;
 	ArrayList <Coin> allCoins;
 	ArrayList <StarCoin> allStarCoins, starCoinsPicked;
 	Rectangle coinRect, starCoinRect, RealRect;
+	int coinCount = 0;
 	
 	ArrayList<Arrow>arrows = new ArrayList<Arrow>();
 	ArrayList<Arrow>eArrows = new ArrayList<Arrow>();
@@ -145,6 +146,9 @@ class GamePanel extends JPanel {
     		coinImage = new ImageIcon(imageName + coinNum.toString() + ".png").getImage();
     		coinImages[i] = coinImage;
     	}
+    	coinBig = coinImages[9];
+    	coinBig = coinBig.getScaledInstance(75, 75, Image.SCALE_SMOOTH);
+    	
     	
     	starCoinImages = new Image[10];
     	for (int i = 0; i < 10; i++){
@@ -200,8 +204,11 @@ class GamePanel extends JPanel {
     public void checkCoin(){
     	for (int i = 0; i < allCoins.size(); i++){
     		coinRect = new Rectangle(allCoins.get(i).getX() - man.getX(), allCoins.get(i).getY(), 50, 50); //smoother to check rectangles/squares than a point on the coin
-    		if (playerRect.intersects(coinRect)){ //player picks up coin			
-    			allCoins.get(i).setPickedTrue();
+    		if (playerRect.intersects(coinRect)){ //player picks up coin
+    			if (!allCoins.get(i).getPicked()){	
+    				allCoins.get(i).setPickedTrue();
+    				coinCount++;
+    			}
     		}
     		if (allCoins.get(i).getPicked() == true){ //once coin is picked up, used for animation
     			if (allCoins.get(i).getY() - allCoins.get(i).getNewY() < 50){ // how far the coin will raise
@@ -545,6 +552,22 @@ class GamePanel extends JPanel {
 		g.drawImage(map1, -man.getX(), 0, this);
 		g.setColor(new Color(0, 0, 0));
 		//g2.fill(playerRect);
+		
+		g.drawImage(coinBig, 1325, 25 , this);
+		String c = "";
+		if (coinCount >= 0 && coinCount <= 9){
+			c = "x00" + coinCount; //add "" so it creates the string Integer.parseInt() and .toString() did not work)
+		}
+		else if (coinCount >= 10 && coinCount <= 99){
+			c = "x0" + coinCount;
+		}
+		else{
+			c = "x" + coinCount;
+		}
+    	g.setFont(new Font("Arial", Font.PLAIN, 50));
+		g.drawString(c, 1460 - g.getFontMetrics().stringWidth(c) / 2, 73); //drawing an centering text
+		
+		
 		for (int i = 0; i < 3; i++){
 			g.drawImage(starCoinBW, 1460 + ((i + 1) * 110), 10 , this); //black and white images of coins (meaning they havent been picked up yet)
 		}
