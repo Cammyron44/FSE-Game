@@ -26,9 +26,8 @@ public class Player {
 	int lives, health;
 	private int green, black, red;
 	private BufferedImage mask = null;
-	private BufferedImage fireball = null;
 	
-	public Player(){
+	public Player(BufferedImage mask){
 		x = 0; //position of background image on screen
 		xPos = 100; //player X
 		yPos = 400; //player Y
@@ -36,6 +35,7 @@ public class Player {
 		vy = 0;
 		direction = "right";
 		jump = false;
+		this.mask = mask;
 		loadImage();
 		ground = true;
 		lives = 1;
@@ -44,12 +44,6 @@ public class Player {
 	}
 	///////////////////////////////LOAD IMAGE//////////////////////////////////////
 	public void loadImage(){
-		try {
-    		mask = ImageIO.read(new File("map1Mask.png"));
-    		fireball = ImageIO.read(new File("map1Fireball.png"));
-		} 
-		catch (IOException e) {
-		}
 		green = getPixelCol(mask, 25, 25); //platform colour
 		red = getPixelCol(mask, 75, 25); //lava
 		black = getPixelCol(mask, 225, 25); //cannons
@@ -110,7 +104,7 @@ public class Player {
 	public void jump(){
 		if (vy < 0){
 			for (int i = 0; i < (int) vy * -1; i++){
-				if (!getColTop(mask, (int) xPos, (int) yPos, green) && !getColTop(fireball, (int) xPos, (int) yPos, black)){
+				if (!getColTop(mask, (int) xPos, (int) yPos, green) && !getColTop(mask, (int) xPos, (int) yPos, black)){
 					yPos -= 1;
 					ground  = false;
 				}
@@ -122,7 +116,7 @@ public class Player {
 		}
 		else{
 			for (int i = 0; i < (int) vy; i++){
-				if (!getColBottom(mask, (int) xPos, (int) yPos, green) && !getColBottom(fireball, (int) xPos, (int) yPos, black)){
+				if (!getColBottom(mask, (int) xPos, (int) yPos, green) && !getColBottom(mask, (int) xPos, (int) yPos, black)){
 					yPos += 1;
 				}
 				else{
@@ -140,7 +134,7 @@ public class Player {
 	
 	public void fall(){
 		for (int i = 0; i < (int) vy; i++){
-			if (!getColBottom(mask, (int) xPos, (int) yPos, green) && !getColBottom(fireball, (int) xPos, (int) yPos, black)){
+			if (!getColBottom(mask, (int) xPos, (int) yPos, green) && !getColBottom(mask, (int) xPos, (int) yPos, black)){
 				yPos += 1;
 				ground = false;
 			}
@@ -163,7 +157,7 @@ public class Player {
 		if (d.equals("right")){
 			direction = "right";
 			for (int i = 0; i < (int) vx; i++){
-				if (!getColRight(mask, (int) xPos, (int) yPos, green) && !getColRight(fireball, (int) xPos, (int) yPos, black)){
+				if (!getColRight(mask, (int) xPos, (int) yPos, green) && !getColRight(mask, (int) xPos, (int) yPos, black)){
 					if (xPos <= 890){
 						xPos += 1;//(int) vx;
 					}
@@ -181,7 +175,7 @@ public class Player {
 		else{
 			direction = "left";
 			for (int i = 0; i < (int) vx; i++){
-				if (!getColLeft(mask, (int) xPos, (int) yPos, green) && !getColLeft(fireball, (int) xPos, (int) yPos, black)){
+				if (!getColLeft(mask, (int) xPos, (int) yPos, green) && !getColLeft(mask, (int) xPos, (int) yPos, black)){
 					if (xPos >= 910){
 						xPos -= 1;//(int) vx;
 					}
@@ -207,7 +201,7 @@ public class Player {
 		}
 		if (d.equals("right")){
 			direction = "right";
-			if (!getColRight(mask, (int) xPos + (int) vx, (int) yPos, green) && !getColRight(fireball, (int) xPos, (int) yPos, black)){
+			if (!getColRight(mask, (int) xPos + (int) vx, (int) yPos, green) && !getColRight(mask, (int) xPos, (int) yPos, black)){
 				if (xPos <= 890){
 					xPos += (int) vx;
 				}
@@ -223,7 +217,7 @@ public class Player {
 		}
 		else{
 			direction = "left";
-			if (!getColLeft(mask, (int) xPos - (int) vx, (int) yPos, green) && !getColLeft(fireball, (int) xPos, (int) yPos, black)){
+			if (!getColLeft(mask, (int) xPos - (int) vx, (int) yPos, green) && !getColLeft(mask, (int) xPos, (int) yPos, black)){
 				if (xPos >= 910){
 					xPos -= (int) vx;
 				}
