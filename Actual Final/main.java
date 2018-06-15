@@ -24,7 +24,7 @@ public class main extends JFrame implements ActionListener, KeyListener {
 	int screenY = 1000;
 	
     public main() {
-    	super("Run Test");
+    	super("Rise of Champions 2");
     	setSize(screenX, screenY);
     	myTimer = new Timer (10, this);
     	myTimer.start();

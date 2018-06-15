@@ -25,16 +25,16 @@ class GamePanel extends JPanel {
 	private int menuCountC = 0;
 	private String screen = "menu";
 	private Image titleText, playText, controlsText, controlsPic, creditsText, camJackText, quitText, backSpaceText;
-	private Image spacePic, map1, map2, map3, lava, castle, diedText, completeText, gameCompleteText, gameOverText;
+	private Image spacePic, map1, map2, map3, lava, castle, diedText, completeText, gameCompleteText, gameOverText, loadingPic;
 	private double lavaX;
-	private int time = 0, cooldown = 100, level = 2;
+	private int time = 0, cooldown = 100, level = 1;
 	private Rectangle playerRect, healthRect;
 	Player man;
 	String playerDirection, playerAction;  //playerDirection keeps the direction of the player  //playerAction keeps the action of the player
 	
 	Rectangle levelCompleteRect;
 	
-	int starCoinCount = 0;
+	int starCoinCount = 0, loadingCount = 0;
 	Integer coin, starCoin;
 	Image coinBig, coinImage, starCoinImage, starCoinBW, starCoinSmall, cannonPic, bullet;
 	Image[] coinImages, starCoinImages;
@@ -92,7 +92,8 @@ class GamePanel extends JPanel {
 
 		spacePic = new ImageIcon("images/spacePic.jpg").getImage();
 		spacePic = spacePic.getScaledInstance(1900, 1000,Image.SCALE_SMOOTH);
-		//test = new ImageIcon("images/test.png").getImage();
+		loadingPic = new ImageIcon("images/loadingPic.jpeg").getImage();
+		loadingPic = loadingPic.getScaledInstance(1900, 1000, Image.SCALE_SMOOTH);
 		map1 = new ImageIcon("images/map1.png").getImage();
 		map2 = new ImageIcon("images/map2.png").getImage();
 		map3 = new ImageIcon("images/map3.png").getImage();
@@ -673,6 +674,14 @@ class GamePanel extends JPanel {
 				loadAll();
 				man.loadImage(mask);
 				respawn();
+				screen = "loading";
+			}
+		}
+		else if (screen.equals("loading")){
+			loadingCount++;
+			if (loadingCount >= 100){
+				loadingCount = 0;
+				screen = "game";
 			}
 		}
 		else if(screen.equals("game complete")){
@@ -890,6 +899,9 @@ class GamePanel extends JPanel {
 			g.setFont(new Font("Arial", Font.PLAIN, 50));
 			String d = "Press ESCAPE to return to the main menu.";
 			g.drawString(d, screenX / 2 - g.getFontMetrics().stringWidth(d) / 2, 600);
+		}
+		else if (screen.equals("loading")){
+			g.drawImage(loadingPic, 0, 0, this);
 		}
 	}
 }
