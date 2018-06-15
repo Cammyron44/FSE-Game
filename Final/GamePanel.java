@@ -27,7 +27,7 @@ class GamePanel extends JPanel {
 	private Image titleText, playText, controlsText, creditsText, camJackText, quitText, backSpaceText;
 	private Image back, backMask, test, map1, map2, map3, lava, castle, diedText, completeText, gameCompleteText, gameOverText;
 	private double lavaX;
-	private int time = 0, cooldown = 100, level = 1;
+	private int time = 0, cooldown = 100, level = 3;
 	private Rectangle playerRect, healthRect;
 	Player man;
 	String playerDirection, playerAction;
@@ -90,23 +90,23 @@ class GamePanel extends JPanel {
 		
 		keys = new boolean [KeyEvent.KEY_LAST + 1];
 
-		back = new ImageIcon("back.jpg").getImage();
+		back = new ImageIcon("images/back.jpg").getImage();
 		back = back.getScaledInstance(1900, 1000,Image.SCALE_SMOOTH);
-		backMask = new ImageIcon("backMask.png").getImage();
+		backMask = new ImageIcon("images/backMask.png").getImage();
 		backMask = backMask.getScaledInstance(1900, 1000, Image.SCALE_SMOOTH);
-		test = new ImageIcon("test.png").getImage();
-		map1 = new ImageIcon("map1.png").getImage();
-		map2 = new ImageIcon("map2.png").getImage();
-		map3 = new ImageIcon("map3.png").getImage();
-		cannonPic = new ImageIcon("cannon.png").getImage();
+		test = new ImageIcon("images/test.png").getImage();
+		map1 = new ImageIcon("images/map1.png").getImage();
+		map2 = new ImageIcon("images/map2.png").getImage();
+		map3 = new ImageIcon("images/map3.png").getImage();
+		cannonPic = new ImageIcon("images/cannon.png").getImage();
 		cannonPic = cannonPic.getScaledInstance(50, 50, Image.SCALE_SMOOTH);
-		bullet = new ImageIcon("bulletBill.png").getImage();
+		bullet = new ImageIcon("images/bulletBill.png").getImage();
 		bullet = bullet.getScaledInstance(50, 25, Image.SCALE_SMOOTH);
 		
-		lava = new ImageIcon("lava.png").getImage();
+		lava = new ImageIcon("images/lava.png").getImage();
 		lavaX = -1900;
 		
-		castle = new ImageIcon("castle.png").getImage();
+		castle = new ImageIcon("images/castle.png").getImage();
 		castle = castle.getScaledInstance((int) (castle.getWidth(null) * 2), (int) (castle.getHeight(null) * 2), Image.SCALE_SMOOTH);
 		
 		playerDirection = "right";
@@ -119,7 +119,7 @@ class GamePanel extends JPanel {
 		starCoinSmall = new ImageIcon("coin/starCoin0.png").getImage();
 		starCoinBW = new ImageIcon("coin/starCoinBW.png").getImage();
 		
-		heart = new ImageIcon("heart.png").getImage();
+		heart = new ImageIcon("images/heart.png").getImage();
 		heart = heart.getScaledInstance(50, 50, Image.SCALE_SMOOTH);
 		
 		coinImages = new Image[10];
@@ -141,7 +141,7 @@ class GamePanel extends JPanel {
     		starCoinImages[i] = starCoinImage;
     	}
     	
-    	fireball = new ImageIcon("fireball.png").getImage();
+    	fireball = new ImageIcon("images/fireball.png").getImage();
     	fireball = fireball.getScaledInstance(50, 50, Image.SCALE_SMOOTH);
     	
     	manImages = new Image[41];
@@ -153,7 +153,7 @@ class GamePanel extends JPanel {
     		manImages[i] = manImage;
     	}
 	}
-	public void loadAll(){
+	public void loadAll(){//method loads all objects into the game
 		loadImage(level);
 		loadHearts();
 		loadCoins();
@@ -163,16 +163,16 @@ class GamePanel extends JPanel {
 		loadCannons();
 	}
 	//////////////////////////////////////////////////////////////////////////////
-	public void loadImage(int level){
+	public void loadImage(int level){//method loads in map based on level
 		try {
 			if(level == 1){
-				mask = ImageIO.read(new File("map1Mask.png"));
+				mask = ImageIO.read(new File("images/map1Mask.png"));
 			}
 			else if(level == 2){
-				mask = ImageIO.read(new File("map2Mask.png"));	
+				mask = ImageIO.read(new File("images/map2Mask.png"));	
 			}
 			else{
-				mask = ImageIO.read(new File("map3Mask.png"));
+				mask = ImageIO.read(new File("images/map3Mask.png"));
 			}
 		} 
 		catch (IOException e) {
@@ -257,10 +257,10 @@ class GamePanel extends JPanel {
     	}
 	}
 	////////////////////////////////////BLOCKS/////////////////////////////////////
-	public void loadBlocks(){
+	public void loadBlocks(){//method loads in block objects
     	for (int i = 0; i < 500; i++){
 			for (int j = 0; j < 20; j++){
-				if (getPixelCol(mask, i * 50, j * 50) == green){
+				if (getPixelCol(mask, i * 50, j * 50) == green){//creates block object where there is green
 					Block block = new Block(i * 50, j * 50, "");
 					blocks.add(block); 
 				}
@@ -317,7 +317,7 @@ class GamePanel extends JPanel {
 	}
 	//////////////////////////////////////////////////////////////////////////////
 		
-	public void move(){
+	public void move(){//player movement
 		//////////////////////////////HORIZONTAL MOVEMENT//////////////////////////////
 		if (keys[KeyEvent.VK_D] || keys[KeyEvent.VK_RIGHT]){
 			if (playerDirection.equals("left")){
@@ -412,12 +412,12 @@ class GamePanel extends JPanel {
 		//////////////////////////////////////////////////////////////////////////////
 	}
 	//////////////////////////////FIREBALLS///////////////////////////////////////
-	public void loadFireballs(){
+	public void loadFireballs(){//method that loads in fireball objects
 		fireballs = new ArrayList<Fireball>();
 		for (int i = 0; i < 500; i++){
 			for (int j = 0; j < 20; j++){
 				if (getPixelCol(mask, i * 50, j * 50) == red && j != 0){ //cannot be 2 because on the mask that space is the base colour (we dont want a coin being created there)
-					fireballs.add(new Fireball(i * 50 - 25, 900, 1000 - j * 50));
+					fireballs.add(new Fireball(i * 50 - 25, 900, 1000 - j * 50));//creates a fireball object where there is red
 				}
 			}
 		}
@@ -455,10 +455,10 @@ class GamePanel extends JPanel {
 		g2.setTransform(saveXform);		
 	}
 	///////////////////////////////////////////CANNONS///////////////////////////////////
-	public void loadCannons(){
+	public void loadCannons(){//method loads in cannon objects
 		for(int i = 0; i < 500; i++){
 			for(int j = 0; j < 20; j++){
-				if(getPixelCol(mask, i * 50, j * 50) == black && j != 0){
+				if(getPixelCol(mask, i * 50, j * 50) == black && j != 0){//creates cannon object where there is black on mask
 					cannons.add(new Cannon(i * 50, j * 50, 1000 - j * 50));
 				}
 			}
@@ -640,6 +640,9 @@ class GamePanel extends JPanel {
 		else if (screen.equals("game over")){
 			if(keys[KeyEvent.VK_ESCAPE]){
 				resetAll();
+				level = 1;
+				loadImage(level);
+				man.loadImage(mask);
 				screen = "menu";
 			}
 		}
