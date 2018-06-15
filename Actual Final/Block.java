@@ -20,22 +20,22 @@ class Block{
 	private int x, y;
 	private Rectangle rect;
 	
-	public Block(int xx, int yy, String t){
+	public Block(int xx, int yy, String t){//constructor
 		x = xx;
 		y = yy;
 		type = t;
 		rect = new Rectangle(x, y, 50, 50);
 	}
 	
-	public Rectangle getRect(){
+	public Rectangle getRect(){//returns rect
 		return rect;
 	}
 	
-	public int getX(){
+	public int getX(){//returns x
 		return x;
 	}
 	
-	public int getY(){
+	public int getY(){//returns y
 		return y;
 	}
 }

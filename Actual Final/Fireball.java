@@ -21,27 +21,27 @@ public class Fireball {
 	double vOrg;
 	boolean rest = false;
 
-    public Fireball(int xx, int yy, double dist) {
+    public Fireball(int xx, int yy, double dist) {//constructor
     	x = xx;
     	y = yy;
     	vOrg = -dist/50;
     	vy = vOrg;
     }
     
-    public void jump(){
+    public void jump(){//jump method
     	if (!rest){
     		vy += 0.15;
     		y += vy;
     	}
     }
     
-    public void reset(){
+    public void reset(){//resets fireball
     	y = 950;
     	vy = vOrg;
     	rest = true;
     }
     
-    public void refresh(){
+    public void refresh(){//if resting add to restCount
     	if (rest){
 	    	if (restCount >= 100){
 	    		rest = false;
@@ -52,7 +52,7 @@ public class Fireball {
 	    	}
     	}   	
     }
-    
+    //getter methods
     public boolean getRest(){
     	return rest;
     }

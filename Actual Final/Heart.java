@@ -10,11 +10,11 @@
 public class Heart {
 	private int x, y;
 	
-    public Heart(int xx, int yy) {
+    public Heart(int xx, int yy) {//constructor
     	x = xx;
     	y = yy;
     }
-    
+    //getter methods
     public int getX(){
     	return x;
     }

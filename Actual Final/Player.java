@@ -99,10 +99,10 @@ public class Player {
     	return b;
     }
 	///////////////////////////////VERTICAL MOVEMENT///////////////////////////////
-	public void jump(){
-		if (vy < 0){
+	public void jump(){//jump method
+		if (vy < 0){//if already jumping(in motion)
 			for (int i = 0; i < (int) vy * -1; i++){
-				if (!getColTop(mask, (int) xPos, (int) yPos, green) && !getColTop(mask, (int) xPos, (int) yPos, black)){
+				if (!getColTop(mask, (int) xPos, (int) yPos, green) && !getColTop(mask, (int) xPos, (int) yPos, black)){//if no block or cannon on top move up
 					yPos -= 1;
 					ground  = false;
 				}
@@ -114,7 +114,7 @@ public class Player {
 		}
 		else{
 			for (int i = 0; i < (int) vy; i++){
-				if (!getColBottom(mask, (int) xPos, (int) yPos, green) && !getColBottom(mask, (int) xPos, (int) yPos, black)){
+				if (!getColBottom(mask, (int) xPos, (int) yPos, green) && !getColBottom(mask, (int) xPos, (int) yPos, black)){//if no block or cannon below
 					yPos += 1;
 				}
 				else{
@@ -125,41 +125,41 @@ public class Player {
 			}
 		}
 		vy += 1;
-		if (getColBottom(mask, (int) xPos, (int) yPos, grey)){
+		if (getColBottom(mask, (int) xPos, (int) yPos, grey)){//if hit lava set health to 0
 			health = 0;
 		}
 	}
 	
-	public void fall(){
+	public void fall(){//falling method
 		for (int i = 0; i < (int) vy; i++){
-			if (!getColBottom(mask, (int) xPos, (int) yPos, green) && !getColBottom(mask, (int) xPos, (int) yPos, black)){
+			if (!getColBottom(mask, (int) xPos, (int) yPos, green) && !getColBottom(mask, (int) xPos, (int) yPos, black)){//if not on block or cannon move down
 				yPos += 1;
 				ground = false;
 			}
-			else{
+			else{//if on block or cannon set jump false, ground true, stop falling
 				vy = 0;
 				jump = false;
 				ground = true;
 			}
 		}
 		vy += 1;
-		if (getColBottom(mask, (int) xPos, (int) yPos, grey)){
+		if (getColBottom(mask, (int) xPos, (int) yPos, grey)){//if hit lava set health to 0
 			health = 0;
 		}
 	}
 	//////////////////////////////HORIZONTAL MOVEMENT//////////////////////////////
-	public void move(String d){
-		if (vx < 5){
+	public void move(String d){//move method
+		if (vx < 5){//if not at max speed add 0.4 to velocity
 			vx += 0.4;
 		}
 		if (d.equals("right")){
 			direction = "right";
 			for (int i = 0; i < (int) vx; i++){
-				if (!getColRight(mask, (int) xPos, (int) yPos, green) && !getColRight(mask, (int) xPos, (int) yPos, black)){
+				if (!getColRight(mask, (int) xPos, (int) yPos, green) && !getColRight(mask, (int) xPos, (int) yPos, black)){//can move if no block to right
 					if (xPos <= 890){
 						xPos += 1;//(int) vx;
 					}
-					else if (x >= 23090){
+					else if (x >= 23090){//if at edge of map
 						if (xPos < 1830){ //max distance
 							xPos += 1;//(int) vx;
 						}
@@ -173,7 +173,7 @@ public class Player {
 		else{
 			direction = "left";
 			for (int i = 0; i < (int) vx; i++){
-				if (!getColLeft(mask, (int) xPos, (int) yPos, green) && !getColLeft(mask, (int) xPos, (int) yPos, black)){
+				if (!getColLeft(mask, (int) xPos, (int) yPos, green) && !getColLeft(mask, (int) xPos, (int) yPos, black)){//if no block to left can move left
 					if (xPos >= 910){
 						xPos -= 1;//(int) vx;
 					}
@@ -188,22 +188,22 @@ public class Player {
 				}
 			}
 		}
-		if (getColBottom(mask, (int) xPos, (int) yPos, grey)){
+		if (getColBottom(mask, (int) xPos, (int) yPos, grey)){//if hit lava set health to 0
 			health = 0;
 		}
 	}
 	
-	public void slowDown(String d){
-		if (vx > 0){
+	public void slowDown(String d){//method for slowing down
+		if (vx > 0){//if not stationary subtract 0.3 from velocity
 			vx -= 0.3;
 		}
 		if (d.equals("right")){
 			direction = "right";
-			if (!getColRight(mask, (int) xPos + (int) vx, (int) yPos, green) && !getColRight(mask, (int) xPos, (int) yPos, black)){
+			if (!getColRight(mask, (int) xPos + (int) vx, (int) yPos, green) && !getColRight(mask, (int) xPos, (int) yPos, black)){//if no block to the right
 				if (xPos <= 890){
 					xPos += (int) vx;
 				}
-				else if (x >= 23090){
+				else if (x >= 23090){//if at rightmost edge of map
 					if (xPos < 1830){ //max distance
 						xPos += (int) vx;
 					}
@@ -215,11 +215,11 @@ public class Player {
 		}
 		else{
 			direction = "left";
-			if (!getColLeft(mask, (int) xPos - (int) vx, (int) yPos, green) && !getColLeft(mask, (int) xPos, (int) yPos, black)){
+			if (!getColLeft(mask, (int) xPos - (int) vx, (int) yPos, green) && !getColLeft(mask, (int) xPos, (int) yPos, black)){//if no block to the left
 				if (xPos >= 910){
 					xPos -= (int) vx;
 				}
-				else if (x <= 10){
+				else if (x <= 10){//if at leftmost edge of map
 					if (xPos > 10){ //min distance
 						xPos -= (int) vx;
 					}
@@ -229,7 +229,7 @@ public class Player {
 				}
 			}
 		}
-		if (getColBottom(mask, (int) xPos, (int) yPos, grey)){
+		if (getColBottom(mask, (int) xPos, (int) yPos, grey)){//if hit lava health set to 0
 			health = 0;
 		}
 	}
@@ -296,15 +296,15 @@ public class Player {
 		return (int)health;
 	}
 	///////////////////////////////////////////////////////////////////////////////
-	public void takeDamage(double d){
+	public void takeDamage(double d){//method for taking damage
 		health -= d;
-		if (health < 0){
+		if (health < 0){//if health would be negative set health to 0
 			health = 0;
 		}
 	}
-	public void addHealth(double i){
+	public void addHealth(double i){//method for adding health
 		health += i;
-		if (health > 100){
+		if (health > 100){//if health would be greater than 100 set health to 100
 			health = 100;
 		}
 	}

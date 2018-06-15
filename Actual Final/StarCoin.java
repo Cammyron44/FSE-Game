@@ -20,7 +20,7 @@ public class StarCoin {
 	private double frame;
 	private boolean picked;
 	
-    public StarCoin(int xx, int yy, int n) {
+    public StarCoin(int xx, int yy, int n) {//constructor
     	x = xx;
     	y = yy;
     	newY = yy;
@@ -33,10 +33,10 @@ public class StarCoin {
     	newY -= 2;
     }
     
-    public void setPickedTrue(){
+    public void setPickedTrue(){//if coin is picked
     	picked = true;
     }
-    
+    //frames for starCoin graphics
     public void increaseFrame(){
     	if (frame > 9){
 			frame = 0;
@@ -54,7 +54,7 @@ public class StarCoin {
 			frame += 0.8;
 		}
     }
-    
+    //Getter methods
     public int getFrame(){
     	return (int) frame;
     }

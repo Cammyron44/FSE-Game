@@ -32,10 +32,10 @@ public class Coin {
     	newY -= 2;
     }
     
-    public void setPickedTrue(){
+    public void setPickedTrue(){//changes coin to picked
     	picked = true;
     }
-    
+    //frames for coin graphics
     public void increaseFrame(){
     	if (frame > 9){
 			frame = 0;
