@@ -67,10 +67,9 @@ class GamePanel extends JPanel {
 	private int menuCountC = 0;
 	private String screen = "menu";
 	private Image titleText, playText, controlsText, creditsText, camJackText, quitText, backSpaceText;
-
-	private Image back, backMask, test, map1, lava, castle;
+	private Image back, backMask, test, map1, map2, map3, lava, castle, diedText, completeText, gameCompleteText, gameOverText;
 	private double lavaX;
-	private int time = 0, cooldown = 125;
+	private int time = 0, cooldown = 100, level = 1;
 	private Rectangle playerRect, healthRect;
 	Player man;
 	String playerDirection, playerAction;
@@ -84,6 +83,7 @@ class GamePanel extends JPanel {
 	ArrayList <Coin> allCoins;
 	ArrayList <StarCoin> allStarCoins, starCoinsPicked;
 	Rectangle coinRect, starCoinRect, RealRect;
+	Rectangle whiteRect = new Rectangle(screenX / 2 - 500, screenY / 2 - 200, 1000, 400);
 	int coinCount = 0;
 	
 	ArrayList<Arrow>arrows = new ArrayList<Arrow>();
@@ -107,7 +107,7 @@ class GamePanel extends JPanel {
 	
 	private BufferedImage mask = null;
 	
-	int green, red, bronze, yellow, black, darkRed;
+	int green, red, bronze, yellow, black, darkRed, white;
 	
 	public GamePanel(){
 		/////////////////////////////////MENU////////////////////////////////////////////////
@@ -121,20 +121,15 @@ class GamePanel extends JPanel {
 		quitText = new ImageIcon("menuText/quitText.png").getImage();
 		quitText = quitText.getScaledInstance(300, 100, Image.SCALE_SMOOTH);
 		backSpaceText = new ImageIcon("menuText/backSpaceText.png").getImage();
-		//backSpaceText = backSpaceText
-		///////////////////////////////////////PLAY///////////////////////////////////////////
 		/////////////////////////////////////CONTROLS/////////////////////////////////////////
-		camJackText = new ImageIcon("menuText/camJackText.png").getImage();
-		/////////////////////////////////////CREDITS//////////////////////////////////////////
-		//////////////////////////////////////////////////////////////////////////////////////
 		
-		loadImage();
-		loadHearts();
-		loadCoins();
-		loadStarCoins();
-		loadFireballs();
-		loadBlocks();
-		loadCannons();
+		/////////////////////////////////////CREDITS/////////////////////////////////////////
+		camJackText = new ImageIcon("menuText/camJackText.png").getImage();
+		//////////////////////////////////////////////////////////////////////////////////////		
+		diedText = new ImageIcon("gameOver/diedText.png").getImage();
+		completeText = new ImageIcon("gameOver/completeText.png").getImage();
+		gameCompleteText = new ImageIcon("gameOver/gameCompleteText.png").getImage();
+		gameOverText = new ImageIcon("gameOver/gameOverText.png").getImage();
 		
 		keys = new boolean [KeyEvent.KEY_LAST + 1];
 
@@ -143,7 +138,9 @@ class GamePanel extends JPanel {
 		backMask = new ImageIcon("backMask.png").getImage();
 		backMask = backMask.getScaledInstance(1900, 1000, Image.SCALE_SMOOTH);
 		test = new ImageIcon("test.png").getImage();
-		map1 = new ImageIcon("map3.png").getImage();
+		map1 = new ImageIcon("map1.png").getImage();
+		map2 = new ImageIcon("map2.png").getImage();
+		map3 = new ImageIcon("map3.png").getImage();
 		cannonPic = new ImageIcon("cannon.png").getImage();
 		cannonPic = cannonPic.getScaledInstance(50, 50, Image.SCALE_SMOOTH);
 		bullet = new ImageIcon("bulletBill.png").getImage();
@@ -158,7 +155,9 @@ class GamePanel extends JPanel {
 		playerDirection = "right";
 		playerAction = "fall";
 		
-		man = new Player();
+		loadAll();
+		
+		man = new Player(mask);
 		
 		starCoinSmall = new ImageIcon("coin/starCoin0.png").getImage();
 		starCoinBW = new ImageIcon("coin/starCoinBW.png").getImage();
@@ -197,10 +196,27 @@ class GamePanel extends JPanel {
     		manImages[i] = manImage;
     	}
 	}
+	public void loadAll(){
+		loadImage(level);
+		loadHearts();
+		loadCoins();
+		loadStarCoins();
+		loadFireballs();
+		loadBlocks();
+		loadCannons();
+	}
 	//////////////////////////////////////////////////////////////////////////////
-	public void loadImage(){
+	public void loadImage(int level){
 		try {
-    		mask = ImageIO.read(new File("map3Mask.png"));
+			if(level == 1){
+				mask = ImageIO.read(new File("map1Mask.png"));
+			}
+			else if(level == 2){
+				mask = ImageIO.read(new File("map2Mask.png"));	
+			}
+			else{
+				mask = ImageIO.read(new File("map3Mask.png"));
+			}
 		} 
 		catch (IOException e) {
 		}
@@ -234,6 +250,9 @@ class GamePanel extends JPanel {
     			if (!allCoins.get(i).getPicked()){	
     				allCoins.get(i).setPickedTrue();
     				coinCount++;
+    				if (coinCount % 100 == 0){ //when 100 coins gave been picked up, give the user another life
+    					man.addLife();
+    				}
     			}
     		}
     		if (allCoins.get(i).getPicked() == true){ //once coin is picked up, used for animation
@@ -343,7 +362,7 @@ class GamePanel extends JPanel {
 		
 	public void move(){
 		//////////////////////////////HORIZONTAL MOVEMENT//////////////////////////////
-		if (keys[KeyEvent.VK_D]){
+		if (keys[KeyEvent.VK_D] || keys[KeyEvent.VK_RIGHT]){
 			if (playerDirection.equals("left")){
 				man.setVx(0);
 				manFrame = 0;
@@ -361,7 +380,7 @@ class GamePanel extends JPanel {
 				manFrame = 0;		
 			}
 		}
-		else if (keys[KeyEvent.VK_A]){
+		else if (keys[KeyEvent.VK_A] || keys[KeyEvent.VK_LEFT]){
 			if (playerDirection.equals("right")){
 				man.setVx(0);
 				manFrame = 0;
@@ -463,7 +482,7 @@ class GamePanel extends JPanel {
 		for(int i = 0; i < fireballs.size(); i++){
 			fireRect = new Rectangle(fireballs.get(i).getX() - man.getX(), fireballs.get(i).getY(), 50, 50);
 			if(fireRect.intersects(playerRect)){
-				man.takeDamage(1);
+				man.takeDamage(0.6);
 			}
 		}
 	}
@@ -501,18 +520,17 @@ class GamePanel extends JPanel {
 	public void setKey(int k, boolean v) {
     	keys[k] = v;
     }
-		
-	public void renderEnemies(){
-		for(int i = 0; i < enemies.size(); i++){
-			Enemy enemy = enemies.get(i);
-			int d = Math.abs(man.getX() - enemy.getX());
-			if(d < 800 && Math.abs(man.getYPos() - enemy.getY()) < 100){
-				enemy.chase(man);
-			}
-    		if(enemy.getHP() <= 0){
-    			enemies.remove(enemy);
-    		}
-		}
+ 	
+	public void respawn(){
+		man.setYPos(400);
+		man.setXPos(100);
+		man.setX(0);
+		man.setVx(0);
+		man.addHealth(100);
+		hearts.clear();
+		loadHearts();
+		eArrows.clear();
+		screen = "game";
 	}
 	
 	public void shootCannons(){
@@ -547,24 +565,39 @@ class GamePanel extends JPanel {
 		time++;
 	}
 	
+	public void resetAll(){
+		eArrows.clear();
+		blocks.clear();
+		cannons.clear();
+		hearts.clear();
+		fireballs.clear();
+		allStarCoins.clear();
+		allCoins.clear();
+		starCoinsPicked.clear();
+		coinCount = 0;
+		level = 1;
+		man = new Player(mask);
+		loadAll();
+	}
+	
 	public void refresh(){
 		if (screen.equals("menu")){
-			if (keys[KeyEvent.VK_W]){
+			if (keys[KeyEvent.VK_W]  || keys[KeyEvent.VK_UP]){
 				if (menuCountC == 1){
 					menuCountC = 0;
 				}
 			}
-			if (keys[KeyEvent.VK_A]){
+			if (keys[KeyEvent.VK_A] || keys[KeyEvent.VK_LEFT]){
 				if (menuCountR == 1){
 					menuCountR = 0;
 				}
 			}
-			if (keys[KeyEvent.VK_S]){
+			if (keys[KeyEvent.VK_S] || keys[KeyEvent.VK_DOWN]){
 				if (menuCountC == 0){
 					menuCountC = 1;
 				}
 			}
-			if (keys[KeyEvent.VK_D]){
+			if (keys[KeyEvent.VK_D] || keys[KeyEvent.VK_RIGHT]){
 				if (menuCountR == 0){
 					menuCountR = 1;
 				}
@@ -608,8 +641,13 @@ class GamePanel extends JPanel {
 		else if (screen.equals("quit")){
 			System.exit(0);
 		}
+		else if(screen.equals("dead")){
+			if(keys[KeyEvent.VK_BACK_SPACE]){
+				respawn();
+			}
+		}
 		else if (screen.equals("game")){
-			playerRect = new Rectangle(man.getXPos(), man.getYPos(), 50, 100);
+			playerRect = new Rectangle(man.getXPos(), man.getYPos(), 68, 84);
 			healthRect = new Rectangle(650, 30, (int)((double) man.getHealth()/100 * 600), 50);
 			RealRect = new Rectangle(man.getX(), man.getYPos(), 50, 100);
 			levelCompleteRect = new Rectangle(25000 - screenX/2 - 5 - man.getX(), 0, 10, 1000);
@@ -623,27 +661,68 @@ class GamePanel extends JPanel {
 			checkStarCoin();
 			coinFrameIncrease();
 			starCoinFrameIncrease();
-			renderEnemies();
 			shootCannons();
-			//if(man.getHealth() <= 0){
-			//	man.subtractLife();
-			//}
-			if (playerRect.intersects(levelCompleteRect)){
-				screen = "level complete";
-			}
-		}
-		else if (screen.equals("level complete")){
-			man.slowDown(playerDirection);
-			if (man.getYPos() < 800){
-				man.fall();
-			}
-			else{
-				if (manFrame < 4){
-					manFrame += 0.05;
+			if(man.getHealth() <= 0){
+				man.subtractLife();
+				if(man.getLives() <= 0){
+					screen = "game over";
 				}
 				else{
-					manFrame = 0;		
+					screen = "dead";	
 				}
+			}
+			if (playerRect.intersects(levelCompleteRect)){
+				if (level == 1 || level ==2){
+					screen = "level complete";
+				}
+				else{
+					screen = "game complete";
+				}
+			}
+		}
+		else if (screen.equals("game over")){
+			if(keys[KeyEvent.VK_ESCAPE]){
+				resetAll();
+				screen = "menu";
+			}
+		}
+		else if(screen.equals("level complete")){
+			man.slowDown(playerDirection);
+			man.fall();
+			if (manFrame < 4){
+				manFrame += 0.05;
+			}
+			else{
+				manFrame = 0;		
+			}
+			if(keys[KeyEvent.VK_ENTER]){
+				level++;
+				eArrows.clear();
+				enemies.clear();
+				blocks.clear();
+				cannons.clear();
+				hearts.clear();
+				fireballs.clear();
+				allStarCoins.clear();
+				allCoins.clear();
+				starCoinsPicked.clear();
+				loadAll();
+				man.loadImage(mask);
+				respawn();
+			}
+		}
+		else if(screen.equals("game complete")){
+			man.slowDown(playerDirection);
+			man.fall();
+			if (manFrame < 4){
+				manFrame += 0.05;
+			}
+			else{
+				manFrame = 0;		
+			}
+			if(keys[KeyEvent.VK_ESCAPE]){
+				resetAll();
+				screen = "menu";
 			}
 		}
 	}
@@ -683,7 +762,15 @@ class GamePanel extends JPanel {
 			for (int i = 0; i < 15; i++){ //blitting lava across the entire map
 				g.drawImage(lava, (int) lavaX - man.getX() + 1900 * i, 900, this);
 			}
-			g.drawImage(map1, -man.getX(), 0, this);
+			if(level == 1){
+				g.drawImage(map1, -man.getX(), 0, this);	
+			}
+			else if(level == 2){
+				g.drawImage(map2, -man.getX(), 0, this);
+			}
+			else{
+				g.drawImage(map3, -man.getX(), 0, this);
+			}
 			g.setColor(new Color(0, 0, 0));
 			//g2.fill(playerRect);
 			
@@ -710,6 +797,18 @@ class GamePanel extends JPanel {
 			}
 			g.drawString(l, 500 - g.getFontMetrics().stringWidth(l) / 2, 73);
 			
+			String ll = "";
+			if (level == 1){
+				ll = "Level 1/3";
+			}
+			else if (level == 2){
+				ll = "Level 2/3";
+			}
+			else{
+				ll = "Level 3/3";
+			}
+			g.drawString(ll, 200 - g.getFontMetrics().stringWidth(ll) / 2, 73);
+			
 			for (int i = 0; i < 3; i++){
 				g.drawImage(starCoinBW, 1460 + ((i + 1) * 110), 10 , this); //black and white images of coins (meaning they havent been picked up yet)
 			}
@@ -727,7 +826,7 @@ class GamePanel extends JPanel {
 			}
 			for(int i = 0; i < eArrows.size(); i++){
 	    		Arrow arrow = eArrows.get(i);
-	    		g.drawImage(bullet, arrow.getX() - man.getX(), arrow.getY(), this);
+	    		g.drawImage(bullet, arrow.getX() - man.getX(), arrow.getY() - 20, this);
 	    	}
 	    	for(int i = 0; i < cannons.size(); i++){
 	    		Cannon cannon = cannons.get(i);
@@ -735,28 +834,28 @@ class GamePanel extends JPanel {
 	    	}
 		
 	    	if (playerAction.equals("stand") && playerDirection.equals("right")){
-	    		g.drawImage(manImages[8 + (int) manFrame], man.getXPos(), man.getYPos() + 19, this);
+	    		g.drawImage(manImages[8 + (int) manFrame], man.getXPos(), man.getYPos() + 2, this);
 	    	}
 	    	else if (playerAction.equals("stand") && playerDirection.equals("left")){
 	    		int w = manImages[8 + (int) manFrame].getWidth(this);
 				int h = manImages[8 + (int) manFrame].getHeight(this);
-	    		g.drawImage(manImages[8 + (int) manFrame], man.getXPos() + 50, man.getYPos() + 19, - w, h, this);
+	    		g.drawImage(manImages[8 + (int) manFrame], man.getXPos() + 50, man.getYPos() + 2, - w, h, this);
 	    	}
 	    	else if (playerAction.equals("run") && playerDirection.equals("right")){
-	    		g.drawImage(manImages[(int) manFrame], man.getXPos() - 10, man.getYPos() + 25, this);
+	    		g.drawImage(manImages[(int) manFrame], man.getXPos() - 5, man.getYPos() + 7, this);
 	    	}
 	    	else if (playerAction.equals("run") && playerDirection.equals("left")){
 	    		int w = manImages[(int) manFrame].getWidth(this);
 				int h = manImages[(int) manFrame].getHeight(this);
-	    		g.drawImage(manImages[(int) manFrame], man.getXPos() + 50, man.getYPos() + 19, - w, h, this);
+	    		g.drawImage(manImages[(int) manFrame], man.getXPos() + 72, man.getYPos() + 7, - w, h, this);
 	    	}
 	    	else if ((playerAction.equals("jump") || playerAction.equals("fall")) && playerDirection.equals("right")){
-	    		g.drawImage(manImages[34 + (int) manFrame], man.getXPos(), man.getYPos(), this);
+	    		g.drawImage(manImages[34 + (int) manFrame], man.getXPos() + 5, man.getYPos(), this);
 	    	}
 	    	else if ((playerAction.equals("jump") || playerAction.equals("fall")) && playerDirection.equals("left")){
 	    		int w = manImages[34 + (int) manFrame].getWidth(this);
 				int h = manImages[34 + (int) manFrame].getHeight(this);
-	    		g.drawImage(manImages[34 + (int) manFrame], man.getXPos() + 50, man.getYPos() + 19, - w, h, this);
+	    		g.drawImage(manImages[34 + (int) manFrame], man.getXPos() + 65, man.getYPos(), - w, h, this);
 	    	}
 			//////////////////////////////////////HEALTH BAR/////////////////////////////////////
 			g.setColor(new Color(255, 255, 255));
@@ -770,12 +869,67 @@ class GamePanel extends JPanel {
 			String s = "" + man.getHealth(); //add "" so it creates the string Integer.parseInt() and .toString() did not work)
 	    	g.setFont(new Font("Arial", Font.PLAIN, 50));
 			g.drawString(s, screenX / 2 - g.getFontMetrics().stringWidth(s) / 2, 73); //drawing an centering text
-			//g2.fill(levelCompleteRect); level end rect
 		}
-		else if (screen.equals("level complete")){
+		else if (screen.equals("dead")){
+			g.setColor(new Color(255, 255, 255));
+			g2.fill(whiteRect);
+			String k = "";
+			if (man.getLives() == 1){
+				k = "You have " + man.getLives() + " life left.";
+			}
+			else{
+				k = "You have " + man.getLives() + " lives left.";
+			}
+			g.setColor(new Color(0, 0, 0));
+			g.setFont(new Font("Arial", Font.PLAIN, 50));
+			g.drawString(k, screenX / 2 - g.getFontMetrics().stringWidth(k) / 2, 600);
+			g.drawImage(diedText, screenX / 2 - diedText.getWidth(null) / 2, 375, this);		
+		}
+		else if(screen.equals("game over")){
+			g.setColor(new Color(255, 255, 255));
+			g2.fill(whiteRect);
+			g.drawImage(gameOverText, screenX / 2 - gameOverText.getWidth(null) / 2, 350, this);
+			g.setColor(new Color(0, 0, 0));
+			g.setFont(new Font("Arial", Font.PLAIN, 50));
+			String c = "You ran out of lives.";
+			String d = "Press ESCAPE to return to the main menu.";
+			g.drawString(c, screenX / 2 - g.getFontMetrics().stringWidth(c) / 2, 520);
+			g.drawString(d, screenX / 2 - g.getFontMetrics().stringWidth(d) / 2, 600);
+		}
+		else if (screen.equals("level complete")){	
 			g.drawImage(castle, 25000 - screenX/2 - castle.getWidth(null)/2 - man.getX(), 135 , this);
-			g.drawImage(map1, -man.getX(), 0, this);
-			g.drawImage(manImages[8 + (int) manFrame], man.getXPos(), man.getYPos() + 19, this);
+			if(level == 1){
+				g.drawImage(map1, -man.getX(), 0, this);	
+			}
+			else{
+				g.drawImage(map2, -man.getX(), 0, this);
+			}
+			g.setColor(new Color(255, 255, 255));
+			g2.fill(whiteRect);
+			g.drawImage(manImages[8 + (int) manFrame], man.getXPos(), man.getYPos() + 2, this);
+			g.drawImage(completeText, screenX / 2 - completeText.getWidth(null) / 2, 375, this);
+			g.setColor(new Color(0, 0, 0));
+			g.setFont(new Font("Arial", Font.PLAIN, 50));
+			String d = "";
+			if (3 - level == 1){
+				d = "You have 1 level left.";
+			}
+			else{
+				d = "You have 2 levels left.";
+			}
+			g.drawString(d, screenX / 2 - g.getFontMetrics().stringWidth(d) / 2, 600);
+		}
+		else if (screen.equals("game complete")){
+			g.drawImage(castle, 25000 - screenX/2 - castle.getWidth(null)/2 - man.getX(), 135 , this);
+			g.drawImage(map3, -man.getX(), 0, this);
+			g.drawImage(manImages[8 + (int) manFrame], man.getXPos(), man.getYPos() + 2, this);
+			g.setColor(new Color(255, 255, 255));
+			g2.fill(whiteRect);
+			g.drawImage(gameCompleteText, screenX / 2 - gameCompleteText.getWidth(null) / 2, 375, this);
+			g.setColor(new Color(0, 0, 0));
+			g.setFont(new Font("Arial", Font.PLAIN, 50));
+			String d = "Press ESPACE to return to the main menu.";
+			g.drawString(d, screenX / 2 - g.getFontMetrics().stringWidth(d) / 2, 600);
 		}
 	}
 }
