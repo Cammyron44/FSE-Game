@@ -27,7 +27,7 @@ class GamePanel extends JPanel {
 	private Image titleText, playText, controlsText, creditsText, camJackText, quitText, backSpaceText;
 	private Image back, backMask, test, map1, map2, map3, lava, castle, diedText, completeText, gameCompleteText, gameOverText;
 	private double lavaX;
-	private int time = 0, cooldown = 100, level = 3;
+	private int time = 0, cooldown = 100, level = 1;
 	private Rectangle playerRect, healthRect;
 	Player man;
 	String playerDirection, playerAction;
@@ -288,7 +288,9 @@ class GamePanel extends JPanel {
     		if (playerRect.intersects(starCoinRect)){ //player picks up coin			
     			if (!allStarCoins.get(i).getPicked()){	
     				allStarCoins.get(i).setPickedTrue();
-    				man.addLife();
+    				if(starCoinsPicked.size() == 3){//if all 3 starcoins picked
+    					man.addLife();//add 1 to player's life
+    				}
     			}
     		}
     		if (allStarCoins.get(i).getPicked() == true){ //once coin is picked up, used for animation
@@ -435,16 +437,16 @@ class GamePanel extends JPanel {
 		}
 	}
 	
-	public void checkFireballs(){
+	public void checkFireballs(){//checks for collision with fireballs and player
 		for(int i = 0; i < fireballs.size(); i++){
 			fireRect = new Rectangle(fireballs.get(i).getX() - man.getX(), fireballs.get(i).getY(), 50, 50);
-			if(fireRect.intersects(playerRect)){
+			if(fireRect.intersects(playerRect)){//player takes damage if collision
 				man.takeDamage(0.6);
 			}
 		}
 	}
 	
-	public void drawFireball(Graphics2D g2,int x,int y){
+	public void drawFireball(Graphics2D g2,int x,int y){//method draws fireball objects
 		AffineTransform saveXform = g2.getTransform();
 		AffineTransform at = new AffineTransform();
 		int w = fireball.getWidth(this);
@@ -465,7 +467,7 @@ class GamePanel extends JPanel {
 		}
 	}
 	//////////////////////////////////////////////////////////////////////////////
-	public void moveLava(){
+	public void moveLava(){//method moves lava image
 		if (lavaX >= 0){
 			lavaX = -1900; //move both pictures to the front again (so there is a constant flow of lava)
 		}
@@ -478,48 +480,48 @@ class GamePanel extends JPanel {
     	keys[k] = v;
     }
  	
-	public void respawn(){
+	public void respawn(){//method for respawning player
 		man.setYPos(400);
 		man.setXPos(100);
-		man.setX(0);
-		man.setVx(0);
-		man.addHealth(100);
-		hearts.clear();
-		loadHearts();
-		eArrows.clear();
-		screen = "game";
+		man.setX(0);//set player to beginning (previous 3 lines)
+		man.setVx(0);//stops any movement
+		man.addHealth(100);//resets player health to 100
+		hearts.clear();//clears hearts
+		loadHearts();//reloads hearts again
+		eArrows.clear();//clears enemy bullets
+		screen = "game";//reset screen to game
 	}
 	
-	public void shootCannons(){
-		if(time >= cooldown){
-			for(int i = 0; i < cannons.size(); i++){
+	public void shootCannons(){//method for shooting cannons
+		if(time >= cooldown){//if cooldown is reached
+			for(int i = 0; i < cannons.size(); i++){//shoot all cannons
 				Cannon cannon = cannons.get(i);
 				eArrows.add(cannon.shoot(man));
-				time = 0;
 			}
+			time = 0;//reset time
 		}
-		for(int i = 0; i < eArrows.size(); i++){
+		for(int i = 0; i < eArrows.size(); i++){//for all arrows
 			Arrow arrow = eArrows.get(i);
-			int d = Math.abs(man.getX() - arrow.getX());
-			if(d > 4000){	
+			int d = Math.abs(man.getX() - arrow.getX());//distance variable 
+			if(d > 4000){//if arrow is at least 4000 pixels away from player delete it	
 				eArrows.remove(arrow);
 				i++;
 			}
-			arrow.move();
+			arrow.move();//move arrow
 			for(int j = 0; j < blocks.size(); j++){
 				Block block = blocks.get(j);
-				if(arrow.getRect(man).intersects(block.getRect())){
-					eArrows.remove(arrow);
+				if(arrow.getRect(man).intersects(block.getRect())){//checks intersection with arrows and blocks
+					eArrows.remove(arrow);//remove arrow if collision
 					i++;
 				}
 			}
-			if(arrow.getRealRect(man).intersects(RealRect)){
-				eArrows.remove(arrow);
-				man.takeDamage(arrow.getDamage());
+			if(arrow.getRealRect(man).intersects(RealRect)){//checks collision of arrow with player
+				eArrows.remove(arrow);//removes arrow
+				man.takeDamage(arrow.getDamage());//damage player
 				i++;
 			}
 		}
-		time++;
+		time++;//add to time (cannon shooting timer)
 	}
 	
 	public void resetAll(){
@@ -887,7 +889,7 @@ class GamePanel extends JPanel {
 			g.drawImage(gameCompleteText, screenX / 2 - gameCompleteText.getWidth(null) / 2, 375, this);
 			g.setColor(new Color(0, 0, 0));
 			g.setFont(new Font("Arial", Font.PLAIN, 50));
-			String d = "Press ESPACE to return to the main menu.";
+			String d = "Press ESCAPE to return to the main menu.";
 			g.drawString(d, screenX / 2 - g.getFontMetrics().stringWidth(d) / 2, 600);
 		}
 	}
