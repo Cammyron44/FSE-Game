@@ -21,9 +21,8 @@ public class Player {
 	private double x, xPos, yPos, vx, vy, sx, sy;
 	private String direction, type = "archer";
 	private boolean jump, ground;
-	int screenX = 1900;
-	int screenY = 1000;
-	int lives, health;
+	private int screenX = 1900, screenY = 1000, lives;
+	double health;
 	private int green, black, red, grey;
 	private BufferedImage mask = null;
 	
@@ -41,7 +40,7 @@ public class Player {
 		black = getPixelCol(mask, 225, 25); //cannons
 		grey = getPixelCol(mask, 475, 25);
 		ground = true;
-		lives = 1;
+		lives = 2;
 		health = 100;
 	}
 	public void loadImage(BufferedImage image){
@@ -234,31 +233,6 @@ public class Player {
 			health = 0;
 		}
 	}
-	/////////////////////////ATTACK///////////////////////////////
-	public Arrow shoot(int damage){
-		return new Arrow(damage, direction, (int)xPos, (int)yPos);
-	}
-	
-	public int damage(){
-		Random random = new Random();
-		int d = 0;
-		if(type.equals("warrior")){
-			minDamage = 40;
-			maxDamage = 80;
-		}
-		if(type.equals("assassin")){
-			minDamage = 10;
-			maxDamage = 100;
-		}
-		if(type.equals("archer")){
-			minDamage = 20;
-			maxDamage = 40;
-		}
-		while(d < minDamage){
-			d = random.nextInt(maxDamage);
-		}
-		return d;
-	}
 	////////////////////////////GETTERS AND SETTERS////////////////////////////////
 	public int getX(){
 		return (int) x;
@@ -319,16 +293,16 @@ public class Player {
 	}
 	
 	public int getHealth(){
-		return health;
+		return (int)health;
 	}
 	///////////////////////////////////////////////////////////////////////////////
-	public void takeDamage(int d){
+	public void takeDamage(double d){
 		health -= d;
 		if (health < 0){
 			health = 0;
 		}
 	}
-	public void addHealth(int i){
+	public void addHealth(double i){
 		health += i;
 		if (health > 100){
 			health = 100;

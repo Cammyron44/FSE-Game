@@ -67,7 +67,7 @@ class GamePanel extends JPanel {
 	private int menuCountC = 0;
 	private String screen = "menu";
 	private Image titleText, playText, controlsText, creditsText, camJackText, quitText, backSpaceText;
-	private Image back, backMask, test, map1, map2, lava, castle;
+	private Image back, backMask, test, map1, map2, lava, castle, gameover;
 	private double lavaX;
 	private int time = 0, cooldown = 100, level = 1;
 	private Rectangle playerRect, healthRect;
@@ -126,6 +126,8 @@ class GamePanel extends JPanel {
 		camJackText = new ImageIcon("menuText/camJackText.png").getImage();
 		/////////////////////////////////////CREDITS//////////////////////////////////////////
 		//////////////////////////////////////////////////////////////////////////////////////
+		gameover = new ImageIcon("gameover.jpg").getImage();
+		gameover = gameover.getScaledInstance(1900, 1000, Image.SCALE_SMOOTH);
 		
 		keys = new boolean [KeyEvent.KEY_LAST + 1];
 
@@ -472,7 +474,7 @@ class GamePanel extends JPanel {
 		for(int i = 0; i < fireballs.size(); i++){
 			fireRect = new Rectangle(fireballs.get(i).getX() - man.getX(), fireballs.get(i).getY(), 50, 50);
 			if(fireRect.intersects(playerRect)){
-				man.takeDamage(1);
+				man.takeDamage(0.6);
 			}
 		}
 	}
@@ -510,38 +512,6 @@ class GamePanel extends JPanel {
 	public void setKey(int k, boolean v) {
     	keys[k] = v;
     }
-		
-	public void loadEnemies(){
-		enemies = new ArrayList<Enemy>();
-		for(int i = 0; i < 500; i++){
-			for(int j = 0; j < 20; j++){
-				if(getPixelCol(mask, i * 50, j * 50) == white && j != 0){
-					enemies.add(new Enemy(i * 50, j * 50, mask));
-				}
-			}
-		}
-	}
-	
-	public void renderEnemies(){
-		for(int i = 0; i < enemies.size(); i++){
-			Enemy enemy = enemies.get(i);
-			int d = Math.abs(man.getX() - enemy.getX());
-			if(d < 800 && Math.abs(man.getYPos() - enemy.getY()) < 150){
-				if(d < 250){
-					enemy.resetTime();
-					//attack
-					if(enemy.attack(RealRect)){
-						man.takeDamage(20);
-					}
-				}
- 			}
- 			enemy.move();
-    		if(enemy.getHealth() <= 0){
-     			enemies.remove(enemy);
-    		}
-    		enemy.addTime();
- 		}
- 	}
  	
 	public void respawn(){
 		man.setYPos(400);
@@ -668,12 +638,15 @@ class GamePanel extends JPanel {
 			checkStarCoin();
 			coinFrameIncrease();
 			starCoinFrameIncrease();
-			renderEnemies();
 			shootCannons();
 			if(man.getHealth() <= 0){
-				System.out.println(man.getHealth());
 				man.subtractLife();
-				screen = "dead";
+				if(man.getLives() <= 0){
+					screen = "gameover";
+				}
+				else{
+					screen = "dead";	
+				}
 			}
 			if (playerRect.intersects(levelCompleteRect)){
 				screen = "level complete";
@@ -838,6 +811,9 @@ class GamePanel extends JPanel {
 	    	g.setFont(new Font("Arial", Font.PLAIN, 50));
 			g.drawString(s, screenX / 2 - g.getFontMetrics().stringWidth(s) / 2, 73); //drawing an centering text
 			//g2.fill(levelCompleteRect); level end rect
+		}
+		else if(screen.equals("gameover")){
+			g.drawImage(gameover, 0, 0, this);
 		}
 		else if (screen.equals("level complete")){	
 			g.drawImage(castle, 25000 - screenX/2 - castle.getWidth(null)/2 - man.getX(), 135 , this);
