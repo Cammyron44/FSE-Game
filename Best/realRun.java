@@ -697,6 +697,7 @@ class GamePanel extends JPanel {
 			}
 			if(keys[KeyEvent.VK_BACK_SPACE]){
 				level++;
+				resetAll();
 				loadAll();
 				man.loadImage(mask);
 				respawn();
