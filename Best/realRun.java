@@ -6,6 +6,7 @@
  * @version 1.00 2018/5/15
  */
 
+import java.applet.*;
 import java.awt.*;
 import java.util.ArrayList;
 import java.awt.event.*;
@@ -69,12 +70,16 @@ class GamePanel extends JPanel {
 	private Image titleText, playText, controlsText, creditsText, camJackText, quitText, backSpaceText;
 	private Image back, backMask, test, map1, map2, map3, lava, castle, gameover;
 	private double lavaX;
-	private int time = 0, cooldown = 100, level = 3;
+	private int time = 0, cooldown = 100, level = 1;
 	private Rectangle playerRect, healthRect;
 	Player man;
 	String playerDirection, playerAction;
 	
 	Rectangle levelCompleteRect;
+	
+	File coinPickUp = new File("coinPickUp.wav");
+	
+	AudioClip coinSound;
 	
 	int starCoinCount = 0;
 	Integer coin, starCoin;
@@ -126,7 +131,7 @@ class GamePanel extends JPanel {
 		camJackText = new ImageIcon("menuText/camJackText.png").getImage();
 		/////////////////////////////////////CREDITS//////////////////////////////////////////
 		//////////////////////////////////////////////////////////////////////////////////////
-		gameover = new ImageIcon("gameover.jpg").getImage();
+		gameover = new ImageIcon("gameoverText.png").getImage();
 		gameover = gameover.getScaledInstance(1900, 1000, Image.SCALE_SMOOTH);
 		
 		keys = new boolean [KeyEvent.KEY_LAST + 1];
@@ -163,6 +168,13 @@ class GamePanel extends JPanel {
 		heart = new ImageIcon("heart.png").getImage();
 		heart = heart.getScaledInstance(50, 50, Image.SCALE_SMOOTH);
 		
+		try{
+    		coinSound = Applet.newAudioClip(coinPickUp.toURL());
+    	}
+    	catch(Exception e){
+    		e.printStackTrace();
+    	}		
+
 		coinImages = new Image[10];
     	for (int i = 0; i < 10; i++){
     		Integer coinNum = i;
@@ -203,6 +215,7 @@ class GamePanel extends JPanel {
 		loadBlocks();
 		loadCannons();
 	}
+
 	//////////////////////////////////////////////////////////////////////////////
 	public void loadImage(int level){
 		try {
@@ -246,6 +259,7 @@ class GamePanel extends JPanel {
     		coinRect = new Rectangle(allCoins.get(i).getX() - man.getX(), allCoins.get(i).getY(), 50, 50); //smoother to check rectangles/squares than a point on the coin
     		if (playerRect.intersects(coinRect)){ //player picks up coin
     			if (!allCoins.get(i).getPicked()){	
+    				coinSound.play();
     				allCoins.get(i).setPickedTrue();
     				coinCount++;
     			}
@@ -559,6 +573,16 @@ class GamePanel extends JPanel {
 		}
 		time++;
 	}
+	public void resetAll(){
+		eArrows.clear();
+		blocks.clear();
+		cannons.clear();
+		hearts.clear();
+		fireballs.clear();
+		allStarCoins.clear();
+		allCoins.clear();
+		starCoinsPicked.clear();
+	}
 	
 	public void refresh(){
 		if (screen.equals("menu")){
@@ -586,6 +610,7 @@ class GamePanel extends JPanel {
 				if (menuCountR == 0){
 					if (menuCountC == 0){
 						screen = "game";
+						respawn();
 					}
 					else{
 						screen = "credits";
@@ -655,6 +680,12 @@ class GamePanel extends JPanel {
 				screen = "level complete";
 			}
 		}
+		else if(screen.equals("gameover")){
+			if(keys[KeyEvent.VK_BACK_SPACE]){
+				screen = "menu";
+				level = 1;
+			}
+		}
 		else if(screen.equals("level complete")){
 			man.slowDown(playerDirection);
 			man.fall();
@@ -666,15 +697,6 @@ class GamePanel extends JPanel {
 			}
 			if(keys[KeyEvent.VK_BACK_SPACE]){
 				level++;
-				eArrows.clear();
-				enemies.clear();
-				blocks.clear();
-				cannons.clear();
-				hearts.clear();
-				fireballs.clear();
-				allStarCoins.clear();
-				allCoins.clear();
-				starCoinsPicked.clear();
 				loadAll();
 				man.loadImage(mask);
 				respawn();
