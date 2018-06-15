@@ -46,7 +46,6 @@ class GamePanel extends JPanel {
 	
 	ArrayList<Arrow>arrows = new ArrayList<Arrow>();
 	ArrayList<Arrow>eArrows = new ArrayList<Arrow>();
-	ArrayList<Enemy>enemies = new ArrayList<Enemy>();
 	ArrayList<Block>blocks = new ArrayList<Block>();
 	ArrayList<Cannon>cannons = new ArrayList<Cannon>();
 	ArrayList<Heart>hearts = new ArrayList<Heart>();
@@ -656,7 +655,6 @@ class GamePanel extends JPanel {
 			if(keys[KeyEvent.VK_ENTER]){
 				level++;
 				eArrows.clear();
-				enemies.clear();
 				blocks.clear();
 				cannons.clear();
 				hearts.clear();
