@@ -67,9 +67,9 @@ class GamePanel extends JPanel {
 	private int menuCountC = 0;
 	private String screen = "menu";
 	private Image titleText, playText, controlsText, creditsText, camJackText, quitText, backSpaceText;
-	private Image back, backMask, test, map1, map2, lava, castle, gameover;
+	private Image back, backMask, test, map1, map2, map3, lava, castle, gameover;
 	private double lavaX;
-	private int time = 0, cooldown = 100, level = 1;
+	private int time = 0, cooldown = 100, level = 3;
 	private Rectangle playerRect, healthRect;
 	Player man;
 	String playerDirection, playerAction;
@@ -138,6 +138,7 @@ class GamePanel extends JPanel {
 		test = new ImageIcon("test.png").getImage();
 		map1 = new ImageIcon("map1.png").getImage();
 		map2 = new ImageIcon("map2.png").getImage();
+		map3 = new ImageIcon("map3.png").getImage();
 		cannonPic = new ImageIcon("cannon.png").getImage();
 		cannonPic = cannonPic.getScaledInstance(50, 50, Image.SCALE_SMOOTH);
 		bullet = new ImageIcon("bulletBill.png").getImage();
@@ -208,8 +209,11 @@ class GamePanel extends JPanel {
 			if(level == 1){
 				mask = ImageIO.read(new File("map1Mask.png"));
 			}
-			if(level == 2){
+			else if(level == 2){
 				mask = ImageIO.read(new File("map2Mask.png"));	
+			}
+			else{
+				mask = ImageIO.read(new File("map3Mask.png"));
 			}
 		} 
 		catch (IOException e) {
@@ -716,11 +720,14 @@ class GamePanel extends JPanel {
 			if(level == 1){
 				g.drawImage(map1, -man.getX(), 0, this);	
 			}
-			if(level == 2){
+			else if(level == 2){
 				g.drawImage(map2, -man.getX(), 0, this);
 			}
+			else{
+				g.drawImage(map3, -man.getX(), 0, this);
+			}
 			g.setColor(new Color(0, 0, 0));
-			g2.fill(playerRect);
+			//g2.fill(playerRect);
 			
 			g.drawImage(coinBig, 1325, 25 , this);
 			String c = "";
@@ -762,7 +769,7 @@ class GamePanel extends JPanel {
 			}
 			for(int i = 0; i < eArrows.size(); i++){
 	    		Arrow arrow = eArrows.get(i);
-	    		g.drawImage(bullet, arrow.getX() - man.getX(), arrow.getY(), this);
+	    		g.drawImage(bullet, arrow.getX() - man.getX(), arrow.getY() - 20, this);
 	    	}
 	    	for(int i = 0; i < cannons.size(); i++){
 	    		Cannon cannon = cannons.get(i);
@@ -815,8 +822,11 @@ class GamePanel extends JPanel {
 			if(level == 1){
 				g.drawImage(map1, -man.getX(), 0, this);	
 			}
-			if(level == 2){
+			else if(level == 2){
 				g.drawImage(map2, -man.getX(), 0, this);
+			}
+			else{
+				g.drawImage(map3, -man.getX(), 0, this);
 			}
 			g.drawImage(manImages[8 + (int) manFrame], man.getXPos(), man.getYPos() + 2, this);
 		}

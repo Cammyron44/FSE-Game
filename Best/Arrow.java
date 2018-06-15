@@ -8,7 +8,7 @@ class Arrow{
 		this.damage = damage;
 		this.direction = direction;
 		this.x = x;
-		this.y = y;
+		this.y = y + 10;
 	}
 	public void move(){
 		if(direction.equals("left")){

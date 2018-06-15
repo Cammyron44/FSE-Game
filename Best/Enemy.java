@@ -1,73 +1,48 @@
 //Enemy
 import java.awt.*;
-import java.util.Random;
-import java.awt.event.*;
-import javax.swing.*;
-import java.awt.image.*;
-import java.io.*;
-import javax.imageio.ImageIO;
-import java.awt.image.BufferedImage;
-
 
 public class Enemy{
-	private int health = 100, cooldown = 50, time = 0, red, green, black, blue, pink;
-	private BufferedImage mask = null;
-	private boolean jump, ground;
-	double vx, vy, x, y;
+	int x, y, xPos, yPos, hp = 100, maxHP = 100, width = 50, height = 50;
 	String direction = "left";
-	public Enemy(int x, int y, BufferedImage mask){
+	public Enemy(int x, int y){
 		this.x = x;
 		this.y = y;
-		this.mask = mask;
 	}
 	public int getX(){
 		return (int)x;
 	}
 	public int getY(){
-		return (int)y;
+		return y;
+	}
+	public int getWidth(){
+		return width;
+	}
+	public int getHeight(){
+		return height;
 	}
 	public Rectangle getRect(){
-		return new Rectangle((int)x, (int)y, 50, 50);
+		return new Rectangle(x, y, width, height);
 	}
 	public String getDirection(){
 		return direction;
 	}
 	public void takeDamage(int damage){
-		health -= damage;
+		hp -= damage;
 	}
-	public int getHealth(){
-		return health;
+	public int getHP(){
+		return hp;
 	}
-	public int getCooldown(){
-		return cooldown;
+	public int getMaxHP(){
+		return maxHP;
 	}
-	public int getTime(){
-		return time;
-	}
-	public void resetTime(){
-		time = 0;
-	}
-	public void addTime(){
-		time++;
-	}
-	public boolean attack(Rectangle manRect){
+	public void move(){
 		if(direction == "left"){
-			Rectangle leftRect = new Rectangle((int)x - 200, (int)y, 200, 50);
-			if(leftRect.intersects(manRect)){
-				return true;
-			}
-			return false;
+			x -= 2;
 		}
 		if(direction == "right"){
-			Rectangle rightRect = new Rectangle((int)x + 200, (int)y, 200, 50);
-			if(rightRect.intersects(manRect)){
-				return true;
-			}
-			return false;
+			x += 2;
 		}
-		return false;
 	}
-
 	public void chase(Player player){
 		if(player.getX() > x){
 			direction = "right";
@@ -76,14 +51,6 @@ public class Enemy{
 		if(player.getX() < x){
 			direction = "left";
 			x -= 4;
-		}
-	}
-	public void move(){
-		if(direction.equals("right")){
-			x += 2;
-		}
-		if(direction.equals("left")){
-			x -= 2;
 		}
 	}
 }
