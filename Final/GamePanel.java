@@ -247,12 +247,12 @@ class GamePanel extends JPanel {
     	}
 	}
 	
-	public void checkHearts(){
+	public void checkHearts(){//method checks hearts for collision
 		for (int i = 0; i < hearts.size(); i++){
     		heartRect = new Rectangle(hearts.get(i).getX() - man.getX(), hearts.get(i).getY(), 50, 50); //smoother to check rectangles/squares than a point on the star coin
-    		if (playerRect.intersects(heartRect)){ //player picks up coin			
-    			hearts.remove(hearts.get(i));
-    			man.addHealth(50);
+    		if (playerRect.intersects(heartRect)){ //player picks up heart		
+    			hearts.remove(hearts.get(i));//removes heart
+    			man.addHealth(50);//adds 50 health
     		}
     	}
 	}
@@ -425,11 +425,11 @@ class GamePanel extends JPanel {
 		}
 	}
 	
-	public void jumpFireballs(){
+	public void jumpFireballs(){//method that makes fireballs jump
 		for (int i = 0; i < fireballs.size(); i++){
 			fireballs.get(i).refresh();
-			if (!fireballs.get(i).getRest()){
-				fireballs.get(i).jump();
+			if (!fireballs.get(i).getRest()){//if not at rest
+				fireballs.get(i).jump();//call jump method
 			}
 			if (fireballs.get(i).getY() >= 950){
 				fireballs.get(i).reset();
@@ -524,7 +524,8 @@ class GamePanel extends JPanel {
 		time++;//add to time (cannon shooting timer)
 	}
 	
-	public void resetAll(){
+	public void resetAll(){//method resets game
+		//method clears all ArrayList
 		eArrows.clear();
 		blocks.clear();
 		cannons.clear();
@@ -533,14 +534,16 @@ class GamePanel extends JPanel {
 		allStarCoins.clear();
 		allCoins.clear();
 		starCoinsPicked.clear();
+		//set coin count to 0
 		coinCount = 0;
+		//set level to 1
 		level = 1;
-		man = new Player(mask);
-		loadAll();
+		man = new Player(mask);//create new man passing in mask
+		loadAll();//load all objects
 	}
 	
-	public void refresh(){
-		if (screen.equals("menu")){
+	public void refresh(){//refresh method
+		if (screen.equals("menu")){//if on menu screen
 			if (keys[KeyEvent.VK_W]  || keys[KeyEvent.VK_UP]){
 				if (menuCountC == 1){
 					menuCountC = 0;
@@ -561,7 +564,7 @@ class GamePanel extends JPanel {
 					menuCountR = 1;
 				}
 			}
-			if (keys[KeyEvent.VK_ENTER]){
+			if (keys[KeyEvent.VK_ENTER]){//if pressed enter
 				if (menuCountR == 0){
 					if (menuCountC == 0){
 						screen = "game";
@@ -600,16 +603,17 @@ class GamePanel extends JPanel {
 		else if (screen.equals("quit")){
 			System.exit(0);
 		}
-		else if(screen.equals("dead")){
-			if(keys[KeyEvent.VK_BACK_SPACE]){
-				respawn();
+		else if(screen.equals("dead")){//if dead
+			if(keys[KeyEvent.VK_BACK_SPACE]){//if clicked backspace respawn
+				respawn();//respawn player
 			}
 		}
-		else if (screen.equals("game")){
+		else if (screen.equals("game")){//if on game screen
 			playerRect = new Rectangle(man.getXPos(), man.getYPos(), 68, 84);
 			healthRect = new Rectangle(650, 30, (int)((double) man.getHealth()/100 * 600), 50);
 			RealRect = new Rectangle(man.getX(), man.getYPos(), 50, 100);
 			levelCompleteRect = new Rectangle(25000 - screenX/2 - 5 - man.getX(), 0, 10, 1000);
+			//call methods
 			move();
 			moveLava();
 			checkHearts();
@@ -621,9 +625,9 @@ class GamePanel extends JPanel {
 			coinFrameIncrease();
 			starCoinFrameIncrease();
 			shootCannons();
-			if(man.getHealth() <= 0){
-				man.subtractLife();
-				if(man.getLives() <= 0){
+			if(man.getHealth() <= 0){//if player's health is low
+				man.subtractLife();//subtract life
+				if(man.getLives() <= 0){//if 0 lives go to game over screen
 					screen = "game over";
 				}
 				else{
