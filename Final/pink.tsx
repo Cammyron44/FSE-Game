@@ -1,0 +1,4 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<tileset name="pink" tilewidth="50" tileheight="50" tilecount="133" columns="19">
+ <image source="pink.jpg" width="950" height="350"/>
+</tileset>
