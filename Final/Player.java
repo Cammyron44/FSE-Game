@@ -40,7 +40,7 @@ public class Player {
 		black = getPixelCol(mask, 225, 25); //cannons
 		grey = getPixelCol(mask, 475, 25);
 		ground = true;
-		lives = 2;
+		lives = 1;
 		health = 100;
 	}
 	public void loadImage(BufferedImage image){
