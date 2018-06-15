@@ -680,6 +680,18 @@ class GamePanel extends JPanel {
 			}
 		}
 		else if(screen.equals("level complete")){
+			man.slowDown(playerDirection);
+			if(man.getYPos() < 800){
+				man.fall();
+			}
+			else{
+				if (manFrame < 4){
+					manFrame += 0.05;
+				}
+				else{
+					manFrame = 0;		
+				}
+			}
 			if(keys[KeyEvent.VK_BACK_SPACE]){
 				level++;
 				eArrows.clear();
@@ -827,13 +839,7 @@ class GamePanel extends JPanel {
 			g.drawString(s, screenX / 2 - g.getFontMetrics().stringWidth(s) / 2, 73); //drawing an centering text
 			//g2.fill(levelCompleteRect); level end rect
 		}
-		else if (screen.equals("level complete")){
-			if (manFrame < 4){
-				manFrame += 0.05;
-			}
-			else{
-				manFrame = 0;		
-			}
+		else if (screen.equals("level complete")){	
 			g.drawImage(castle, 25000 - screenX/2 - castle.getWidth(null)/2 - man.getX(), 135 , this);
 			if(level == 1){
 				g.drawImage(map1, -man.getX(), 0, this);	
