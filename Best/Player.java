@@ -54,7 +54,7 @@ public class Player {
     public boolean getColTop(BufferedImage image, int xx, int yy, int col){
     	boolean b = false;
     	int c = image.getRGB(xx + (int) x, yy);
-    	for (int d = 0; d < 50; d++){
+    	for (int d = 0; d < 68; d++){
     		c = image.getRGB(d + xx + (int) x, yy);
     		if (c == col){
     			b = true;
@@ -65,9 +65,9 @@ public class Player {
     
     public boolean getColBottom(BufferedImage image, int xx, int yy, int col){
     	boolean b = false;
-    	int c = image.getRGB(xx + (int )x, yy + 100);
-    	for (int d = 0; d < 50; d++){
-    		c = image.getRGB(d + xx + (int) x, yy + 100);
+    	int c = image.getRGB(xx + (int )x, yy + 84);
+    	for (int d = 0; d < 68; d++){
+    		c = image.getRGB(d + xx + (int) x, yy + 84);
     		if (c == col){
     			b = true;
     		}
@@ -77,9 +77,9 @@ public class Player {
     
     public boolean getColRight(BufferedImage image, int xx, int yy, int col){
     	boolean b = false;
-    	int c = image.getRGB(xx + (int) x + 50, yy + 100);
-    	for (int d = 0; d < 100; d++){
-    		c = image.getRGB(xx + (int) x + 50, yy + d);
+    	int c = image.getRGB(xx + (int) x + 68, yy + 84);
+    	for (int d = 0; d < 84; d++){
+    		c = image.getRGB(xx + (int) x + 68, yy + d);
     		if (c == col){
     			b = true;
     		}
@@ -89,8 +89,8 @@ public class Player {
     
     public boolean getColLeft(BufferedImage image, int xx, int yy, int col){
     	boolean b = false;
-    	int c = image.getRGB(xx + (int) x - 1, yy + 100);
-    	for (int d = 0; d < 100; d++){
+    	int c = image.getRGB(xx + (int) x - 1, yy + 84);
+    	for (int d = 0; d < 84; d++){
     		c = image.getRGB(xx + (int) x - 1, yy + d);
     		if (c == col){
     			b = true;

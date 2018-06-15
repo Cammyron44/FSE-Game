@@ -323,7 +323,6 @@ class GamePanel extends JPanel {
     			if (!allStarCoins.get(i).getPicked()){	
     				allStarCoins.get(i).setPickedTrue();
     				man.addLife();
-    				System.out.println(man.getLives());
     			}
     		}
     		if (allStarCoins.get(i).getPicked() == true){ //once coin is picked up, used for animation
@@ -354,7 +353,7 @@ class GamePanel extends JPanel {
 		
 	public void move(){
 		//////////////////////////////HORIZONTAL MOVEMENT//////////////////////////////
-		if (keys[KeyEvent.VK_D]){
+		if (keys[KeyEvent.VK_D] || keys[KeyEvent.VK_RIGHT]){
 			if (playerDirection.equals("left")){
 				man.setVx(0);
 				manFrame = 0;
@@ -372,7 +371,7 @@ class GamePanel extends JPanel {
 				manFrame = 0;		
 			}
 		}
-		else if (keys[KeyEvent.VK_A]){
+		else if (keys[KeyEvent.VK_A] || keys[KeyEvent.VK_LEFT]){
 			if (playerDirection.equals("right")){
 				man.setVx(0);
 				manFrame = 0;
@@ -559,22 +558,22 @@ class GamePanel extends JPanel {
 	
 	public void refresh(){
 		if (screen.equals("menu")){
-			if (keys[KeyEvent.VK_W]){
+			if (keys[KeyEvent.VK_W]  || keys[KeyEvent.VK_UP]){
 				if (menuCountC == 1){
 					menuCountC = 0;
 				}
 			}
-			if (keys[KeyEvent.VK_A]){
+			if (keys[KeyEvent.VK_A] || keys[KeyEvent.VK_LEFT]){
 				if (menuCountR == 1){
 					menuCountR = 0;
 				}
 			}
-			if (keys[KeyEvent.VK_S]){
+			if (keys[KeyEvent.VK_S] || keys[KeyEvent.VK_DOWN]){
 				if (menuCountC == 0){
 					menuCountC = 1;
 				}
 			}
-			if (keys[KeyEvent.VK_D]){
+			if (keys[KeyEvent.VK_D] || keys[KeyEvent.VK_RIGHT]){
 				if (menuCountR == 0){
 					menuCountR = 1;
 				}
@@ -624,7 +623,7 @@ class GamePanel extends JPanel {
 			}
 		}
 		else if (screen.equals("game")){
-			playerRect = new Rectangle(man.getXPos(), man.getYPos(), 50, 100);
+			playerRect = new Rectangle(man.getXPos(), man.getYPos(), 68, 84);
 			healthRect = new Rectangle(650, 30, (int)((double) man.getHealth()/100 * 600), 50);
 			RealRect = new Rectangle(man.getX(), man.getYPos(), 50, 100);
 			levelCompleteRect = new Rectangle(25000 - screenX/2 - 5 - man.getX(), 0, 10, 1000);
@@ -654,16 +653,12 @@ class GamePanel extends JPanel {
 		}
 		else if(screen.equals("level complete")){
 			man.slowDown(playerDirection);
-			if(man.getYPos() < 800){
-				man.fall();
+			man.fall();
+			if (manFrame < 4){
+				manFrame += 0.05;
 			}
 			else{
-				if (manFrame < 4){
-					manFrame += 0.05;
-				}
-				else{
-					manFrame = 0;		
-				}
+				manFrame = 0;		
 			}
 			if(keys[KeyEvent.VK_BACK_SPACE]){
 				level++;
@@ -725,7 +720,7 @@ class GamePanel extends JPanel {
 				g.drawImage(map2, -man.getX(), 0, this);
 			}
 			g.setColor(new Color(0, 0, 0));
-			//g2.fill(playerRect);
+			g2.fill(playerRect);
 			
 			g.drawImage(coinBig, 1325, 25 , this);
 			String c = "";
@@ -775,28 +770,28 @@ class GamePanel extends JPanel {
 	    	}
 		
 	    	if (playerAction.equals("stand") && playerDirection.equals("right")){
-	    		g.drawImage(manImages[8 + (int) manFrame], man.getXPos(), man.getYPos() + 19, this);
+	    		g.drawImage(manImages[8 + (int) manFrame], man.getXPos(), man.getYPos() + 2, this);
 	    	}
 	    	else if (playerAction.equals("stand") && playerDirection.equals("left")){
 	    		int w = manImages[8 + (int) manFrame].getWidth(this);
 				int h = manImages[8 + (int) manFrame].getHeight(this);
-	    		g.drawImage(manImages[8 + (int) manFrame], man.getXPos() + 50, man.getYPos() + 19, - w, h, this);
+	    		g.drawImage(manImages[8 + (int) manFrame], man.getXPos() + 50, man.getYPos() + 2, - w, h, this);
 	    	}
 	    	else if (playerAction.equals("run") && playerDirection.equals("right")){
-	    		g.drawImage(manImages[(int) manFrame], man.getXPos() - 10, man.getYPos() + 25, this);
+	    		g.drawImage(manImages[(int) manFrame], man.getXPos() - 5, man.getYPos() + 7, this);
 	    	}
 	    	else if (playerAction.equals("run") && playerDirection.equals("left")){
 	    		int w = manImages[(int) manFrame].getWidth(this);
 				int h = manImages[(int) manFrame].getHeight(this);
-	    		g.drawImage(manImages[(int) manFrame], man.getXPos() + 50, man.getYPos() + 19, - w, h, this);
+	    		g.drawImage(manImages[(int) manFrame], man.getXPos() + 72, man.getYPos() + 7, - w, h, this);
 	    	}
 	    	else if ((playerAction.equals("jump") || playerAction.equals("fall")) && playerDirection.equals("right")){
-	    		g.drawImage(manImages[34 + (int) manFrame], man.getXPos(), man.getYPos(), this);
+	    		g.drawImage(manImages[34 + (int) manFrame], man.getXPos() + 5, man.getYPos(), this);
 	    	}
 	    	else if ((playerAction.equals("jump") || playerAction.equals("fall")) && playerDirection.equals("left")){
 	    		int w = manImages[34 + (int) manFrame].getWidth(this);
 				int h = manImages[34 + (int) manFrame].getHeight(this);
-	    		g.drawImage(manImages[34 + (int) manFrame], man.getXPos() + 50, man.getYPos() + 19, - w, h, this);
+	    		g.drawImage(manImages[34 + (int) manFrame], man.getXPos() + 65, man.getYPos(), - w, h, this);
 	    	}
 			//////////////////////////////////////HEALTH BAR/////////////////////////////////////
 			g.setColor(new Color(255, 255, 255));
@@ -823,7 +818,7 @@ class GamePanel extends JPanel {
 			if(level == 2){
 				g.drawImage(map2, -man.getX(), 0, this);
 			}
-			g.drawImage(manImages[8 + (int) manFrame], man.getXPos(), man.getYPos() + 19, this);
+			g.drawImage(manImages[8 + (int) manFrame], man.getXPos(), man.getYPos() + 2, this);
 		}
 	}
 }
