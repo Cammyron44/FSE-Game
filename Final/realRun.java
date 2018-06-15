@@ -126,10 +126,10 @@ class GamePanel extends JPanel {
 		/////////////////////////////////////CONTROLS/////////////////////////////////////////
 		camJackText = new ImageIcon("menuText/camJackText.png").getImage();
 		//////////////////////////////////////////////////////////////////////////////////////		
-		diedText = new ImageIcon("diedText.png").getImage();
-		completeText = new ImageIcon("completeText.png").getImage();
-		gameCompleteText = new ImageIcon("gameCompleteText.png").getImage();
-		gameOverText = new ImageIcon("gameOverText.png").getImage();
+		diedText = new ImageIcon("gameOver/diedText.png").getImage();
+		completeText = new ImageIcon("gameOver/completeText.png").getImage();
+		gameCompleteText = new ImageIcon("gameOver/gameCompleteText.png").getImage();
+		gameOverText = new ImageIcon("gameOver/gameOverText.png").getImage();
 		
 		keys = new boolean [KeyEvent.KEY_LAST + 1];
 
