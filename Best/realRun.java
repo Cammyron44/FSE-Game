@@ -67,10 +67,9 @@ class GamePanel extends JPanel {
 	private int menuCountC = 0;
 	private String screen = "menu";
 	private Image titleText, playText, controlsText, creditsText, camJackText, quitText, backSpaceText;
-
-	private Image back, backMask, test, map1, lava, castle;
+	private Image back, backMask, test, map1, map2, lava, castle;
 	private double lavaX;
-	private int time = 0, cooldown = 125;
+	private int time = 0, cooldown = 100, level = 1;
 	private Rectangle playerRect, healthRect;
 	Player man;
 	String playerDirection, playerAction;
@@ -107,7 +106,7 @@ class GamePanel extends JPanel {
 	
 	private BufferedImage mask = null;
 	
-	int green, red, bronze, yellow, black, darkRed;
+	int green, red, bronze, yellow, black, darkRed, white;
 	
 	public GamePanel(){
 		/////////////////////////////////MENU////////////////////////////////////////////////
@@ -128,14 +127,6 @@ class GamePanel extends JPanel {
 		/////////////////////////////////////CREDITS//////////////////////////////////////////
 		//////////////////////////////////////////////////////////////////////////////////////
 		
-		loadImage();
-		loadHearts();
-		loadCoins();
-		loadStarCoins();
-		loadFireballs();
-		loadBlocks();
-		loadCannons();
-		
 		keys = new boolean [KeyEvent.KEY_LAST + 1];
 
 		back = new ImageIcon("back.jpg").getImage();
@@ -144,6 +135,7 @@ class GamePanel extends JPanel {
 		backMask = backMask.getScaledInstance(1900, 1000, Image.SCALE_SMOOTH);
 		test = new ImageIcon("test.png").getImage();
 		map1 = new ImageIcon("map1.png").getImage();
+		map2 = new ImageIcon("map2.png").getImage();
 		cannonPic = new ImageIcon("cannon.png").getImage();
 		cannonPic = cannonPic.getScaledInstance(50, 50, Image.SCALE_SMOOTH);
 		bullet = new ImageIcon("bulletBill.png").getImage();
@@ -158,7 +150,9 @@ class GamePanel extends JPanel {
 		playerDirection = "right";
 		playerAction = "fall";
 		
-		man = new Player();
+		loadAll();
+		
+		man = new Player(mask);
 		
 		starCoinSmall = new ImageIcon("coin/starCoin0.png").getImage();
 		starCoinBW = new ImageIcon("coin/starCoinBW.png").getImage();
@@ -197,10 +191,24 @@ class GamePanel extends JPanel {
     		manImages[i] = manImage;
     	}
 	}
+	public void loadAll(){
+		loadImage(level);
+		loadHearts();
+		loadCoins();
+		loadStarCoins();
+		loadFireballs();
+		loadBlocks();
+		loadCannons();
+	}
 	//////////////////////////////////////////////////////////////////////////////
-	public void loadImage(){
+	public void loadImage(int level){
 		try {
-    		mask = ImageIO.read(new File("map1Mask.png"));
+			if(level == 1){
+				mask = ImageIO.read(new File("map1Mask.png"));
+			}
+			if(level == 2){
+				mask = ImageIO.read(new File("map2Mask.png"));	
+			}
 		} 
 		catch (IOException e) {
 		}
@@ -442,7 +450,6 @@ class GamePanel extends JPanel {
 		for (int i = 0; i < 500; i++){
 			for (int j = 0; j < 20; j++){
 				if (getPixelCol(mask, i * 50, j * 50) == red && j != 0){ //cannot be 2 because on the mask that space is the base colour (we dont want a coin being created there)
-					///fireballs.add(new Fireball(i * 50 - 25, j * 50)); //wherever there is a bronze space on the mask, create a coin object there
 					fireballs.add(new Fireball(i * 50 - 25, 900, 1000 - j * 50));
 				}
 			}
@@ -504,17 +511,48 @@ class GamePanel extends JPanel {
     	keys[k] = v;
     }
 		
+	public void loadEnemies(){
+		enemies = new ArrayList<Enemy>();
+		for(int i = 0; i < 500; i++){
+			for(int j = 0; j < 20; j++){
+				if(getPixelCol(mask, i * 50, j * 50) == white && j != 0){
+					enemies.add(new Enemy(i * 50, j * 50, mask));
+				}
+			}
+		}
+	}
+	
 	public void renderEnemies(){
 		for(int i = 0; i < enemies.size(); i++){
 			Enemy enemy = enemies.get(i);
 			int d = Math.abs(man.getX() - enemy.getX());
-			if(d < 800 && Math.abs(man.getYPos() - enemy.getY()) < 100){
-				enemy.chase(man);
-			}
-    		if(enemy.getHP() <= 0){
-    			enemies.remove(enemy);
+			if(d < 800 && Math.abs(man.getYPos() - enemy.getY()) < 150){
+				if(d < 250){
+					enemy.resetTime();
+					//attack
+					if(enemy.attack(RealRect)){
+						man.takeDamage(20);
+					}
+				}
+ 			}
+ 			enemy.move();
+    		if(enemy.getHealth() <= 0){
+     			enemies.remove(enemy);
     		}
-		}
+    		enemy.addTime();
+ 		}
+ 	}
+ 	
+	public void respawn(){
+		man.setYPos(400);
+		man.setXPos(100);
+		man.setX(0);
+		man.setVx(0);
+		man.addHealth(100);
+		hearts.clear();
+		loadHearts();
+		eArrows.clear();
+		screen = "game";
 	}
 	
 	public void shootCannons(){
@@ -610,6 +648,11 @@ class GamePanel extends JPanel {
 		else if (screen.equals("quit")){
 			System.exit(0);
 		}
+		else if(screen.equals("dead")){
+			if(keys[KeyEvent.VK_BACK_SPACE]){
+				respawn();
+			}
+		}
 		else if (screen.equals("game")){
 			playerRect = new Rectangle(man.getXPos(), man.getYPos(), 50, 100);
 			healthRect = new Rectangle(650, 30, (int)((double) man.getHealth()/100 * 600), 50);
@@ -628,10 +671,29 @@ class GamePanel extends JPanel {
 			renderEnemies();
 			shootCannons();
 			if(man.getHealth() <= 0){
+				System.out.println(man.getHealth());
 				man.subtractLife();
+				screen = "dead";
 			}
 			if (playerRect.intersects(levelCompleteRect)){
 				screen = "level complete";
+			}
+		}
+		else if(screen.equals("level complete")){
+			if(keys[KeyEvent.VK_BACK_SPACE]){
+				level++;
+				eArrows.clear();
+				enemies.clear();
+				blocks.clear();
+				cannons.clear();
+				hearts.clear();
+				fireballs.clear();
+				allStarCoins.clear();
+				allCoins.clear();
+				starCoinsPicked.clear();
+				loadAll();
+				man.loadImage(mask);
+				respawn();
 			}
 		}
 	}
@@ -671,7 +733,12 @@ class GamePanel extends JPanel {
 			for (int i = 0; i < 15; i++){ //blitting lava across the entire map
 				g.drawImage(lava, (int) lavaX - man.getX() + 1900 * i, 900, this);
 			}
-			g.drawImage(map1, -man.getX(), 0, this);
+			if(level == 1){
+				g.drawImage(map1, -man.getX(), 0, this);	
+			}
+			if(level == 2){
+				g.drawImage(map2, -man.getX(), 0, this);
+			}
 			g.setColor(new Color(0, 0, 0));
 			//g2.fill(playerRect);
 			
@@ -768,7 +835,12 @@ class GamePanel extends JPanel {
 				manFrame = 0;		
 			}
 			g.drawImage(castle, 25000 - screenX/2 - castle.getWidth(null)/2 - man.getX(), 135 , this);
-			g.drawImage(map1, -man.getX(), 0, this);
+			if(level == 1){
+				g.drawImage(map1, -man.getX(), 0, this);	
+			}
+			if(level == 2){
+				g.drawImage(map2, -man.getX(), 0, this);
+			}
 			g.drawImage(manImages[8 + (int) manFrame], man.getXPos(), man.getYPos() + 19, this);
 		}
 	}

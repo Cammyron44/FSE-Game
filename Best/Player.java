@@ -24,10 +24,10 @@ public class Player {
 	int screenX = 1900;
 	int screenY = 1000;
 	int lives, health;
-	private int green, black, red;
+	private int green, black, red, grey;
 	private BufferedImage mask = null;
 	
-	public Player(){
+	public Player(BufferedImage image){
 		x = 0; //position of background image on screen
 		xPos = 100; //player X
 		yPos = 400; //player Y
@@ -35,23 +35,18 @@ public class Player {
 		vy = 0;
 		direction = "right";
 		jump = false;
-		loadImage();
-		ground = true;
-		lives = 1;
-		health = 100;
-	
-	}
-	///////////////////////////////LOAD IMAGE//////////////////////////////////////
-	public void loadImage(){
-		try {
-    		mask = ImageIO.read(new File("map1Mask.png"));
-		} 
-		catch (IOException e) {
-		}
+		mask = image;
 		green = getPixelCol(mask, 25, 25); //platform colour
 		red = getPixelCol(mask, 75, 25); //lava
 		black = getPixelCol(mask, 225, 25); //cannons
-    }
+		grey = getPixelCol(mask, 475, 25);
+		ground = true;
+		lives = 1;
+		health = 100;
+	}
+	public void loadImage(BufferedImage image){
+		mask = image;
+	}
     ///////////////////////////////PIXEL COLOUR////////////////////////////////////
     public int getPixelCol(BufferedImage image, int xx, int yy){
     	return image.getRGB(xx + (int)x, yy);
@@ -131,7 +126,7 @@ public class Player {
 			}
 		}
 		vy += 1;
-		if (getColBottom(mask, (int) xPos, (int) yPos, red)){
+		if (getColBottom(mask, (int) xPos, (int) yPos, grey)){
 			health = 0;
 		}
 	}
@@ -149,7 +144,7 @@ public class Player {
 			}
 		}
 		vy += 1;
-		if (getColBottom(mask, (int) xPos, (int) yPos, red)){
+		if (getColBottom(mask, (int) xPos, (int) yPos, grey)){
 			health = 0;
 		}
 	}
@@ -194,7 +189,7 @@ public class Player {
 				}
 			}
 		}
-		if (getColBottom(mask, (int) xPos, (int) yPos, red)){
+		if (getColBottom(mask, (int) xPos, (int) yPos, grey)){
 			health = 0;
 		}
 	}
@@ -235,7 +230,7 @@ public class Player {
 				}
 			}
 		}
-		if (getColBottom(mask, (int) xPos, (int) yPos, red)){
+		if (getColBottom(mask, (int) xPos, (int) yPos, grey)){
 			health = 0;
 		}
 	}
@@ -273,8 +268,18 @@ public class Player {
 		return (int) xPos;
 	}
 	
+	public void setX(double d){
+		x = d;
+	}
+	public void setXPos(double d){
+		xPos = d;
+	}
+	
 	public int getYPos(){
 		return (int) yPos;
+	}
+	public void setYPos(double d){
+		yPos = d;
 	}
 		
 	public int getVx(){
